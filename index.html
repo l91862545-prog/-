@@ -4,7 +4,7 @@
 <meta name="color-scheme" content="light"><meta name="theme-color" content="#eeefe7">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小倉庫">
 <meta name="little-storage-web-app" content="1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; manifest-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https:; manifest-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'">
 <link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./moon-192.png">
 <title>小倉庫</title><style>:root{--paper:#f6f5ef;--panel:#eeefe7;--ink:#35443b;--muted:#7d887c;--line:#dfe3d8;--green:#536b53;--green-dark:#3f5842;--sage:#e1e7d9;--gold:#a28e6b;--message-size:16px;font-family:"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
 *{box-sizing:border-box}body{margin:0}button,input,textarea,select{font:inherit;color:inherit}button,a,label.upload-label{ -webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #7e9774;outline-offset:3px}button{border:0;background:none}svg{width:21px;height:21px;flex:none}button svg{pointer-events:none}input,select,textarea{border:1px solid var(--line);border-radius:10px;background:#fcfcf7;min-width:0}input,select{padding:11px 12px}textarea{padding:12px;resize:vertical;line-height:1.8}select{cursor:pointer}button{touch-action:manipulation}h1,h2,p{margin-top:0}h1,h2{font-weight:500}h1{font-family:"Noto Serif TC","Songti TC",Georgia,serif;font-size:30px;letter-spacing:1px}h2{font-size:18px}p{line-height:1.85}small{font-size:11px}.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.mobile-only{display:none!important}
@@ -162,14 +162,76 @@ body.story-open .topbar{height:48px;padding-top:0;padding-bottom:0}
 .quote-draft{display:flex;gap:6px;align-items:center;grid-column:1/-1}
 .quote-draft blockquote{flex:1;min-width:0;margin:0}
 
+/* One compact conversation layout at every viewport size. */
+#app .main.messenger{display:flex;flex-direction:column;min-width:0;background:#f5f4f9}
+.messenger > .topbar{display:none}
+#app .im-page{display:flex;flex:1;min-height:0;flex-direction:column;width:100%;max-width:960px;margin:auto;background:#fbfaff;color:#29233e}
+.im-header{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;text-align:center;min-height:61px;padding:max(8px,env(safe-area-inset-top)) 13px 8px;border-bottom:1px solid #e5e2ef;background:#fff}
+.im-header h1{font-size:1.1rem;line-height:1.3;margin:0}
+.im-header small{display:block;color:#655d7d;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.im-header button{justify-self:start}
+#app .im-page .messages{min-height:0;flex:1;overflow:auto;padding:18px clamp(12px,3vw,30px);overscroll-behavior:contain}
+.im-page .message-column{width:100%;max-width:100%}
+.im-row{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px}
+.im-row.outgoing{flex-direction:row-reverse}
+.im-avatar.avatar{width:33px;height:33px;border-radius:12px;flex-shrink:0;background:#ebe6f8;color:#524078}
+.im-content{min-width:0;max-width:75%}
+.im-bubble{padding:9px 13px;border-radius:5px 17px 17px 17px;background:#edebf6;font-size:var(--message-size);line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.outgoing .im-bubble{color:#fff;background:#574185;border-radius:17px 5px 17px 17px}
+.im-meta{align-self:flex-end;color:#625a77;display:grid;gap:2px;font-size:.73rem;white-space:nowrap;padding-bottom:24px}
+.outgoing .im-meta{text-align:right}
+.im-content .quote-action{display:block;color:#655a7e;margin-top:1px}
+.outgoing .quote-action{margin-left:auto}
+.chat-media{display:block;width:auto;max-width:100%;max-height:270px;border-radius:9px;object-fit:contain}
+.im-sticker{font-size:2.6rem;background:transparent!important;color:inherit!important;padding:0 7px}
+.im-sticker .chat-media{max-width:105px;max-height:105px}
+.im-empty,.im-pending{color:#625a77;text-align:center;padding:12px 15px}
+.im-composer-wrap{background:#fff;border-top:1px solid #e5e2ef;padding:7px max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.im-composer{display:grid;align-items:end;grid-template-columns:auto minmax(0,1fr) 42px;gap:6px}
+.im-composer textarea{width:100%;min-height:41px;max-height:146px;resize:none;border:1px solid #d9d1e6;border-radius:16px;padding:9px 11px;background:#f9f7fc;font-size:max(16px,var(--message-size));outline-offset:2px}
+.im-tools{display:flex;gap:0}
+.im-tools .icon-btn{width:36px;height:42px;color:#564278}
+.im-tools svg{width:20px;height:20px}
+.im-composer .send-button{margin:0;width:42px;height:42px;border-radius:14px;background:#574185}
+.sticker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.sticker-grid button{min-height:50px;border:1px solid #ddd5ea;background:#faf8ff;border-radius:10px;font-size:1.6rem}
+.sticker-grid img{display:block;width:100%;height:48px;object-fit:contain}
+.life-page{width:100%;max-width:800px;margin:0 auto;padding:24px}
+.life-page h1{font-size:1.55rem}
+.life-page article,.life-comment{border-top:1px solid #ebe6ef;margin-top:12px;padding-top:12px}
+.life-card{background:#fff;border:1px solid #e3deed;border-radius:14px;padding:15px;margin:12px 0;overflow-wrap:anywhere}
+.life-card h2,.life-card h3{margin-top:0}
+.life-card article p{white-space:pre-wrap}
+.trend-row{display:grid;grid-template-columns:100px minmax(0,1fr) auto;gap:10px;align-items:center;margin:6px 0}
+.trend-row meter{width:100%}
+[hidden]{display:none!important}
+@media(max-width:760px){
+ .im-content{max-width:65%}
+ .im-meta{font-size:.65rem}
+ .im-composer{gap:4px}
+ .im-tools .icon-btn{width:34px}
+ .life-page{padding:16px}
+}
+@media(max-width:345px){.im-tools .icon-btn{width:29px}.im-composer .send-button{width:39px}}
+
+.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.calendar-header button{font-size:1.5rem;min-width:44px;min-height:44px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;max-width:430px;margin-inline:auto}
+.calendar-grid>span{padding:5px 0;color:#655d7d;font-size:.84rem}
+.calendar-day{min-width:0;min-height:44px;border:1px solid transparent;border-radius:9px;background:#f7f5fa;color:#443558;padding:0}
+.calendar-day[aria-current=date]{border-color:#8b76b3;font-weight:700}
+.calendar-day[aria-pressed=true]{background:#9b3d64;color:#fff;border-color:#9b3d64;font-weight:650}
+.player-profile-avatar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:0 0 14px}
+.player-profile-avatar .avatar{width:58px;height:58px}
+
 @media(max-width:760px){.topbar,.chat-mode .topbar{height:calc(50px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}.chat-mode .composer-wrap{padding-bottom:max(12px,env(safe-area-inset-bottom))}}</style></head>
 <body><div id="app"><div class="boot">正在開啟小倉庫…</div></div><dialog id="modal" aria-label="操作視窗"></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>(function(root){
 'use strict';
 const copy=x=>structuredClone(x),id=()=>globalThis.crypto?.randomUUID?.()||'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),now=()=>new Date().toISOString();
-const DEFAULT_MODEL_SETTINGS=Object.freeze({provider:'mock',model:'mock-fixed',contextMessages:20,retryCount:0,maxOutputTokens:1800});
+const DEFAULT_MODEL_SETTINGS=Object.freeze({provider:'mock',model:'mock-fixed',contextMessages:20,retryCount:0,maxOutputTokens:600});
 function normalizeModelSettings(value){const v=value&&typeof value==='object'?value:{};const contextMessages=Number(v.contextMessages),retryCount=Number(v.retryCount),maxOutputTokens=Number(v.maxOutputTokens);return {provider:typeof v.provider==='string'&&/^[a-z0-9._-]{1,60}$/i.test(v.provider)?v.provider:DEFAULT_MODEL_SETTINGS.provider,model:typeof v.model==='string'&&v.model.length<=120&&v.model.trim()?v.model.trim():DEFAULT_MODEL_SETTINGS.model,contextMessages:Number.isInteger(contextMessages)&&contextMessages>=1&&contextMessages<=50?contextMessages:DEFAULT_MODEL_SETTINGS.contextMessages,retryCount:Number.isInteger(retryCount)&&retryCount>=0&&retryCount<=2?retryCount:DEFAULT_MODEL_SETTINGS.retryCount,maxOutputTokens:Number.isInteger(maxOutputTokens)&&maxOutputTokens>=16&&maxOutputTokens<=4000?maxOutputTokens:DEFAULT_MODEL_SETTINGS.maxOutputTokens};}
-function seed(){const characterId=id(),worldId=id(),threadId=id();return {schema:1,characters:[{id:characterId,name:'示範角色',description:'可在「角色與世界」改成自己的角色。',persona:'以繁體中文自然聊天，根據當前對話回應。',avatar:''}],worlds:[{id:worldId,characterId,name:'日常',instructions:'日常與工作協作。不同世界與 IF 線的經歷不自動互通。',memory:''}],threads:[{id:threadId,worldId,title:'新的對話',roomType:'room',maxOutputTokens:null,createdAt:now(),updatedAt:now()}],messages:[],references:[],settings:{playerName:'妳',fontSize:16,model:copy(DEFAULT_MODEL_SETTINGS)},selected:{characterId,worldId,threadId}};}
+function seed(){const characterId=id(),worldId=id(),threadId=id();return {schema:1,characters:[{id:characterId,name:'示範角色',description:'可在「角色與世界」改成自己的角色。',persona:'以繁體中文自然聊天，根據當前對話回應。',avatar:''}],worlds:[{id:worldId,characterId,name:'日常',instructions:'日常與工作協作。不同世界與 IF 線的經歷不自動互通。',memory:''}],threads:[{id:threadId,worldId,title:'新的對話',roomType:'phone',maxOutputTokens:null,createdAt:now(),updatedAt:now()}],messages:[],references:[],settings:{playerName:'妳',fontSize:16,model:copy(DEFAULT_MODEL_SETTINGS)},selected:{characterId,worldId,threadId}};}
 function validate(input){
  if(!input||input.schema!==1)throw Error('不支援這份資料的版本。');const w=copy(input),ids=new Set();
  for(const [k,max] of [['characters',100],['worlds',500],['threads',5000],['messages',100000],['references',1000]])if(!Array.isArray(w[k])||w[k].length>max)throw Error('資料不完整或超過本版容量：'+k);
@@ -179,8 +241,14 @@ function validate(input){
  for(const c of w.characters){unique(c);if(!text(c.name,60)||!c.name.trim()||!text(c.description,200)||!text(c.persona)||!text(c.avatar,3000000)||c.avatar&&!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(c.avatar))throw Error('角色資料格式不正確。');}
  for(const x of w.worlds){unique(x);if(!w.characters.some(c=>c.id===x.characterId)||!text(x.name,80)||!x.name.trim()||!text(x.instructions)||!text(x.memory))throw Error('世界資料格式不正確。');}
  for(const c of w.characters)if(!w.worlds.some(x=>x.characterId===c.id))throw Error('每個角色至少需要一個世界。');
- for(const t of w.threads){if(t.roomType===undefined)t.roomType='room';if(t.maxOutputTokens===undefined)t.maxOutputTokens=null;unique(t);if(!w.worlds.some(x=>x.id===t.worldId)||!text(t.title,120)||!text(t.createdAt,80)||!text(t.updatedAt,80)||!['room','phone'].includes(t.roomType)||t.maxOutputTokens!==null&&(!Number.isInteger(t.maxOutputTokens)||t.maxOutputTokens<16||t.maxOutputTokens>4000))throw Error('對話資料格式不正確。');}
+ for(const t of w.threads){t.roomType='phone';if(t.maxOutputTokens===undefined)t.maxOutputTokens=null;unique(t);if(!w.worlds.some(x=>x.id===t.worldId)||!text(t.title,120)||!text(t.createdAt,80)||!text(t.updatedAt,80)||!['room','phone'].includes(t.roomType)||t.maxOutputTokens!==null&&(!Number.isInteger(t.maxOutputTokens)||t.maxOutputTokens<16||t.maxOutputTokens>4000))throw Error('對話資料格式不正確。');}
  for(const m of w.messages){unique(m);if(!w.threads.some(t=>t.id===m.threadId)||!['user','assistant'].includes(m.role)||!text(m.content,32000)||!text(m.createdAt,80)||typeof m.mock!=='boolean')throw Error('訊息資料格式不正確。');}
+ for(const message of w.messages){
+  if(!validImage(message.image))delete message.image;
+  if(!['photo','sticker','gift'].includes(message.kind))delete message.kind;
+  if(typeof message.readAt!=='string'||!Number.isFinite(Date.parse(message.readAt)))delete message.readAt;
+ }
+ for(const character of w.characters)if(!['fast','steady','slow'].includes(character.pace))character.pace='steady';
  const messageIndex=new Map(w.messages.map(m=>[m.id,m]));
  for(const m of w.messages){
   const quoted=messageIndex.get(m.replyTo);
@@ -188,11 +256,22 @@ function validate(input){
  }
  for(const r of w.references){unique(r);if(!w.worlds.some(x=>x.id===r.worldId)||!text(r.name,200)||!text(r.content,250000))throw Error('Reference 資料格式不正確。');}
  if(!w.settings||!text(w.settings.playerName,60)||![15,16,18,20].includes(w.settings.fontSize))throw Error('設定格式不正確。');w.settings.model=normalizeModelSettings(w.settings.model);
+ w.settings.playerNickname=text(w.settings.playerNickname,60)?w.settings.playerNickname.trim():w.settings.playerName==='妳'?'':w.settings.playerName;
+ w.settings.playerDisplayName=text(w.settings.playerDisplayName,60)?w.settings.playerDisplayName.trim():'';
+ w.settings.playerAvatar=validImage(w.settings.playerAvatar)?w.settings.playerAvatar:'';
+ w.settings.customStickers=(Array.isArray(w.settings.customStickers)?w.settings.customStickers:[]).filter(validImage).slice(0,12);
  if(!w.selected||!w.characters.some(c=>c.id===w.selected.characterId)||!w.worlds.some(x=>x.id===w.selected.worldId&&x.characterId===w.selected.characterId)||w.selected.threadId!==null&&!w.threads.some(t=>t.id===w.selected.threadId&&t.worldId===w.selected.worldId))throw Error('目前的角色／世界／對話不相符。');
  if(Object.hasOwn(w,'chatTransferRemoved'))delete w.chatTransferRemoved;
- if(Object.hasOwn(w,'storyVault'))delete w.storyVault;return w;
+ if(Object.hasOwn(w,'storyVault'))delete w.storyVault;if(globalThis.LittleLife)LittleLife.normalize(w);return w;
 }
 function scope(w){const character=w.characters.find(c=>c.id===w.selected.characterId),world=w.worlds.find(x=>x.id===w.selected.worldId&&x.characterId===character.id),thread=w.threads.find(t=>t.id===w.selected.threadId&&t.worldId===world.id);return {character,world,thread};}
+const gifts=['奶茶','熱湯','花束','小蛋糕','手寫卡片','毛絨兔'];
+const stickers=['🫶','🐰','🥺','✨','❤️','🥰','😼','🍜','🌙'];
+function validImage(value){return typeof value==='string'&&value.length<=750000&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value);}
+function splitReply(content){
+ const parts=content.split(/\s*\|\|\s*|\n\s*\n/).map(text=>text.trim()).filter(Boolean);
+ return parts.length>4?[...parts.slice(0,3),parts.slice(3).join('\n\n')]:parts;
+}
 function contextMessages(w,threadId,limit){
  const messages=w.messages.filter(m=>m.threadId===threadId);
  const selected=messages.slice(-limit);
@@ -201,10 +280,10 @@ function contextMessages(w,threadId,limit){
  return selected.map(m=>{
   const quote=quotes.get(m.replyTo);
   const content=quote?'【引用】\n'+quote+'\n【本則訊息】\n'+m.content:m.content;
-  return {role:m.role,content};
+  return {role:m.role,content,image:m.image,kind:m.kind};
  });
 }
-function context(w,options={}){const {character,world,thread}=scope(w),model=normalizeModelSettings(w.settings?.model),limit=Number.isInteger(options.messageLimit)?Math.max(1,Math.min(50,options.messageLimit)):model.contextMessages,effectiveMax=Number.isInteger(thread?.maxOutputTokens)?thread.maxOutputTokens:model.maxOutputTokens;return {character:{id:character.id,name:character.name,persona:character.persona},world:{id:world.id,name:world.name,instructions:world.instructions,memory:world.memory},room:{type:thread?.roomType||'room',maxOutputTokens:effectiveMax},references:w.references.filter(r=>r.worldId===world.id).map(r=>({name:r.name,content:r.content})),messages:thread?contextMessages(w,thread.id,limit):[],request:{provider:model.provider,model:model.model,contextMessages:limit,maxOutputTokens:effectiveMax}};}
+function context(w,options={}){const {character,world,thread}=scope(w),model=normalizeModelSettings(w.settings?.model),limit=Number.isInteger(options.messageLimit)?Math.max(1,Math.min(50,options.messageLimit)):model.contextMessages,effectiveMax=Number.isInteger(thread?.maxOutputTokens)?thread.maxOutputTokens:model.maxOutputTokens;return {character:{id:character.id,name:character.name,persona:character.persona},playerName:w.settings.playerName==='妳'?'':w.settings.playerName,world:{id:world.id,name:world.name,instructions:world.instructions,memory:world.memory},room:{type:'phone',maxOutputTokens:effectiveMax},references:w.references.filter(r=>r.worldId===world.id).map(r=>({name:r.name,content:r.content})),messages:thread?contextMessages(w,thread.id,limit):[],request:{provider:model.provider,model:model.model,contextMessages:limit,maxOutputTokens:effectiveMax}};}
 function backup(w){return {format:'moonlit-chat-backup',version:1,exportedAt:now(),workspace:validate(w)};}
 function readBackup(v){if(!['moonlit-chat-backup','moonlit-home-backup'].includes(v?.format)||v.version!==1)throw Error('請選擇月光聊天室備份；舊版月光小屋整包備份也可匯入，故事館資料會自動忽略。');return validate(v.workspace);}
 function characterPackage(w,characterId,history=false){const character=w.characters.find(c=>c.id===characterId);if(!character)throw Error('找不到角色。');const worlds=w.worlds.filter(x=>x.characterId===characterId).map(x=>({...x,memory:history?x.memory:''}));const threads=history?w.threads.filter(t=>worlds.some(x=>x.id===t.worldId)):[];return {format:'moonlit-character',version:1,includesHistory:history,character:copy(character),worlds:copy(worlds),threads:copy(threads),messages:history?copy(w.messages.filter(m=>threads.some(t=>t.id===m.threadId))):[],references:copy(w.references.filter(r=>worlds.some(x=>x.id===r.worldId)))};}
@@ -224,7 +303,7 @@ class ProviderError extends Error{constructor(message,{code='provider_error',ret
 const providers=new Map();
 function registerProvider(provider){if(!provider||typeof provider.id!=='string'||!/^[a-z0-9._-]{1,60}$/i.test(provider.id)||typeof provider.generate!=='function')throw Error('Provider 格式不正確。');const models=Array.isArray(provider.models)&&provider.models.length?provider.models.map(x=>typeof x==='string'?{id:x,label:x}:x).filter(x=>x&&typeof x.id==='string'&&x.id.trim()).map(x=>({id:x.id.trim().slice(0,120),label:String(x.label||x.id).slice(0,120)})):[{id:'default',label:'Default'}];provider.models=models;providers.set(provider.id,provider);return provider;}
 function providerCatalog(){return [...providers.values()].map(p=>({id:p.id,label:String(p.label||p.id),description:String(p.description||''),external:Boolean(p.external),models:copy(p.models)}));}
-class MockProvider{constructor(){this.id='mock';this.label='Mock Provider';this.description='固定測試回覆，不會呼叫外部模型。';this.external=false;this.models=[{id:'mock-fixed',label:'固定測試回覆'}];}async generate(request,{signal,onDelta}={}){if(signal?.aborted)throw new ProviderError('已取消這次回覆。',{code:'cancelled'});const content='我收到這句了。先把它留在這裡。\n\n這是「'+request.character.name+'」的固定測試回覆，尚未連接模型，也沒有把對話送到外部服務。';if(onDelta)onDelta(content);return {role:'assistant',content,mock:true};}}
+class MockProvider{constructor(){this.id='mock';this.label='Mock Provider';this.description='固定測試回覆，不會呼叫外部模型。';this.external=false;this.models=[{id:'mock-fixed',label:'固定測試回覆'}];}async generate(request,{signal,onDelta}={}){if(signal?.aborted)throw new ProviderError('已取消這次回覆。',{code:'cancelled'});const content=request.proactive?'欸，突然想到妳。||妳現在有空聊一下嗎？':'我收到這句了。先把它留在這裡。\n\n這是「'+request.character.name+'」的固定測試回覆，尚未連接模型，也沒有把對話送到外部服務。';if(onDelta)onDelta(content);return {role:'assistant',content,mock:true};}}
 registerProvider(new MockProvider());
 function abortError(){return new ProviderError('已取消這次回覆。',{code:'cancelled'});}
 function wait(ms,signal){return new Promise((resolve,reject)=>{if(signal?.aborted)return reject(abortError());const timer=setTimeout(resolve,ms);if(signal)signal.addEventListener('abort',()=>{clearTimeout(timer);reject(abortError());},{once:true});});}
@@ -235,33 +314,50 @@ class WorkspaceService{
  change(mutate){const job=this.tail.then(async()=>{const next=copy(this.workspace);await mutate(next);const valid=validate(next);await this.repository.save(valid);this.workspace=valid;return valid;});this.tail=job.catch(()=>{});return job;}
  replace(w){const next=validate(w);return this.change(draft=>{for(const k of Object.keys(draft))delete draft[k];Object.assign(draft,next);});}
  cancel(){if(this.activeController&&!this.activeController.signal.aborted){this.activeController.abort();return true;}return false;}
- async send(content,{onDelta,mockOnly=false,modelOverride,replyTo}={}){
-  if(!content.trim()||content.length>32000)throw Error('請輸入 1–32,000 個字。');
+ async send(content,{onDelta,modelOverride,replyTo,proactive=false,image,kind}={}){
+  if((!proactive&&!content.trim())||content.length>32000)throw Error('請輸入 1–32,000 個字。');
   if(this.activeController)throw Error('上一則回覆仍在處理中。');
   const controller=new AbortController();this.activeController=controller;
   const guardedDelta=value=>{if(!controller.signal.aborted)onDelta?.(value);};
   try{return await this.change(async w=>{
    let {world,thread}=scope(w);
-   if(!thread){thread={id:id(),worldId:world.id,title:content.trim().slice(0,24),roomType:'room',maxOutputTokens:null,createdAt:now(),updatedAt:now()};w.threads.push(thread);w.selected.threadId=thread.id;}
+   if(!thread){thread={id:id(),worldId:world.id,title:content.trim().slice(0,24),roomType:'phone',maxOutputTokens:null,createdAt:now(),updatedAt:now()};w.threads.push(thread);w.selected.threadId=thread.id;}
    const first=!w.messages.some(m=>m.threadId===thread.id);
    const message={id:id(),threadId:thread.id,role:'user',content:content.trim(),createdAt:now(),mock:false};
    if(w.messages.some(m=>m.id===replyTo&&m.threadId===thread.id))message.replyTo=replyTo;
-   w.messages.push(message);
-   if(first)thread.title=content.trim().slice(0,24);
-   const model=normalizeModelSettings(mockOnly?{...w.settings.model,provider:'mock',model:'mock-fixed'}:modelOverride??w.settings.model),provider=providers.get(model.provider);
+   if(kind)message.kind=kind;
+   if(kind==='gift'&&globalThis.LittleLife){
+    if(LittleLife.points(w)<5)throw Error('虛擬點數不足。');
+    w.life.wallet.push({text:content,amount:-5});
+   }
+   if(validImage(image))message.image=image;
+   if(!proactive)w.messages.push(message);
+   if(first&&!proactive)thread.title=content.trim().slice(0,24);
+   const model=normalizeModelSettings(modelOverride??w.settings.model),provider=providers.get(model.provider);
    if(!provider)throw new ProviderError('目前沒有安裝「'+model.provider+'」Provider。',{code:'provider_missing'});
-   if(provider.id!=='gemini'&&provider.models.length&&!provider.models.some(x=>x.id===model.model))throw new ProviderError('目前 Provider 不支援「'+model.model+'」模型。',{code:'model_missing'});
-   const rawAnswer=await generateWithRetry(provider,context(mockOnly||modelOverride?{...w,settings:{...w.settings,model}}:w),{signal:controller.signal,model:model.model,retryCount:model.retryCount,onDelta:guardedDelta});
+   if(provider.id==='mock'&&provider.models.length&&!provider.models.some(x=>x.id===model.model))throw new ProviderError('目前 Provider 不支援「'+model.model+'」模型。',{code:'model_missing'});
+   const request=context({...w,settings:{...w.settings,model}});
+   request.proactive=proactive;
+   const today=globalThis.LittleLife?.localDate();
+   const events=w.life?.events.filter(row=>row.worldId===world.id&&(row.date===today||row.annual===true&&typeof row.date==='string'&&row.date.slice(5)===today.slice(5)))??[];
+   if(events.length)request.world.instructions+='\n【今天的行程】\n'+events.map(row=>row.text).join('、');
+   if(proactive)request.messages.push({role:'user',content:'請以角色身分主動傳一則新訊息給我。這是私下指令，請直接發訊息。'});
+   const rawAnswer=await generateWithRetry(provider,request,{signal:controller.signal,model:model.model,retryCount:model.retryCount,onDelta:guardedDelta});
    if(controller.signal.aborted)throw abortError();
    const answer=normalizeAnswer(rawAnswer,provider);
    if(controller.signal.aborted)throw abortError();
-   w.messages.push({...answer,id:id(),threadId:thread.id,createdAt:now()});
+   const bubbles=splitReply(answer.content);
+   if(!bubbles.length)throw new ProviderError('角色沒有回覆內容。');
+   const pace=scope(w).character.pace;
+   if(!answer.mock)await wait({fast:0,steady:280,slow:1000}[pace]??280,controller.signal);
+   if(!proactive&&!answer.mock)message.readAt=now();
+   for(const content of bubbles)w.messages.push({...answer,content,id:id(),threadId:thread.id,createdAt:now()});
    thread.updatedAt=now();
    if(controller.signal.aborted)throw abortError();
   });}finally{if(this.activeController===controller)this.activeController=null;}
  }
 }
-const api={id,now,copy,DEFAULT_MODEL_SETTINGS,normalizeModelSettings,seed,validate,scope,context,backup,readBackup,characterPackage,addPackage,deleteThread,ProviderError,MockProvider,providers,registerProvider,providerCatalog,generateWithRetry,WorkspaceService};
+const api={id,now,copy,DEFAULT_MODEL_SETTINGS,normalizeModelSettings,seed,validate,scope,context,backup,readBackup,characterPackage,addPackage,deleteThread,ProviderError,MockProvider,providers,registerProvider,providerCatalog,generateWithRetry,WorkspaceService,validImage,gifts,stickers};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ChatCore=api;
 })(globalThis);
 
@@ -289,18 +385,22 @@ function clip(text,max){const s=String(text||'');return s.length<=max?s:s.slice(
 function buildSystem(request){
  const parts=[];const character=request?.character||{},world=request?.world||{},refs=Array.isArray(request?.references)?request.references:[];
  parts.push(`你現在以角色「${clean(character.name)||'角色'}」的身份回覆。`);
+ if(clean(request?.playerName))parts.push('對方希望你稱呼她為「'+clean(request.playerName)+'」。');
  if(clean(character.persona))parts.push('【角色核心】\n'+clean(character.persona));
  if(clean(world.name))parts.push('【目前世界／IF】\n'+clean(world.name));
  if(clean(world.instructions))parts.push('【世界設定】\n'+clean(world.instructions));
  if(clean(world.memory))parts.push('【此世界的手動記憶】\n'+clean(world.memory));
  if(refs.length){let used=0,omitted=0;const blocks=[];for(const r of refs){const block=`【參考資料：${clean(r.name)||'未命名'}】\n${clean(r.content)}`;if(used+block.length>45000){omitted++;continue;}blocks.push(block);used+=block.length;}if(omitted)blocks.push(`[另有 ${omitted} 份參考資料因本次 API 預算上限未帶入]`);if(blocks.length)parts.push(blocks.join('\n\n'));}
- if(request?.room?.type==='phone')parts.push('【目前房型】\n手機短訊息房。這是一對一自然即時聊天，不是場景生成、設計稿、摘要、關鍵字抽取或標籤列舉。第一優先是理解並直接回應使用者最新一句的語意、情緒與關係意圖。若使用者是在打招呼、測試、吐槽、撒嬌或閒聊，請像真人聊天一樣自然接話。除非使用者明確要求，禁止只輸出場景詞、風格詞、地點詞、標籤、名詞片段、提綱或關鍵字清單；不要因參考資料裡出現某些描述詞，就把那些詞直接當成答案。保持即時通訊節奏，通常一到數個短訊息，不主動展開長篇敘事；但短不等於殘缺，每一則都必須語意完整並承接上一句。需要時可用空行分成 1–3 個短泡泡。角色設定與使用者當下要求仍然優先。');
+ parts.push('用即時訊息的口吻，回一至三則簡短、自然的訊息。需要分成多則時使用 || 分隔，不加旁白或角色標籤。');
+ if(request?.proactive)parts.push('這次由你主動開啟話題，可以接續近期對話。請直接傳訊，不假裝收到一則新訊息。');
  parts.push('請遵守以上角色、世界與記憶邊界。不要假裝知道未提供的共同經歷；若資料彼此衝突，以較具體、較新的當前對話為準。');
  return clip(parts.join('\n\n'),MAX_INSTRUCTION_CHARS);
 }
 function buildContents(request){
- const source=Array.isArray(request?.messages)?request.messages:[];const chosen=[];let used=0;
- for(let i=source.length-1;i>=0;i--){const m=source[i];if(!m||!['user','assistant'].includes(m.role)||typeof m.content!=='string')continue;const remaining=MAX_MESSAGE_CHARS-used;if(remaining<=0)break;const text=m.content.length<=remaining?m.content:m.content.slice(m.content.length-remaining);chosen.push({role:m.role==='assistant'?'model':'user',parts:[{text}]});used+=text.length;}
+ const source=Array.isArray(request?.messages)?request.messages:[];const chosen=[];let used=0,images=0;
+ for(let i=source.length-1;i>=0;i--){const m=source[i];if(!m||!['user','assistant'].includes(m.role)||typeof m.content!=='string')continue;const remaining=MAX_MESSAGE_CHARS-used;if(remaining<=0)break;const text=m.content.length<=remaining?m.content:m.content.slice(m.content.length-remaining);const parts=[{text}];if(images<2&&C.validImage(m.image)){
+  const [prefix,data]=m.image.split(',');parts.push({inlineData:{mimeType:prefix.slice(5,-7),data}});images++;
+ }chosen.push({role:m.role==='assistant'?'model':'user',parts});used+=text.length;}
  return chosen.reverse();
 }
 function buildGeminiRequest(request,model){return {model,systemInstruction:{parts:[{text:buildSystem(request)}]},contents:buildContents(request),generationConfig:{maxOutputTokens:Number.isInteger(request?.request?.maxOutputTokens)?Math.max(16,Math.min(4000,request.request.maxOutputTokens)):DEFAULT_MAX_OUTPUT_TOKENS}};}
@@ -399,6 +499,86 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:' && root.isSecu
 }
 })(globalThis);
 
+(function (root){
+'use strict';
+const C=root.ChatCore;
+const storageKey='little-storage-custom-api:'+new URL('./',location.href).pathname;
+let config={url:'',key:''};
+try{
+ const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');
+ if(typeof saved.url==='string')config.url=saved.url;
+ if(typeof saved.key==='string')config.key=saved.key;
+}catch(_){}
+function save(url,key,remember){
+ if(url){
+  const endpoint=new URL(url);
+  if(endpoint.protocol!=='https:'||endpoint.username||endpoint.password||endpoint.search||endpoint.hash){
+   throw Error('請使用完整的 HTTPS API 網址，網址本身請勿包含金鑰、查詢參數或片段。');
+  }
+  url=endpoint.href;
+ }
+ try{
+  if(remember&&url)localStorage.setItem(storageKey,JSON.stringify({url,key}));
+  else localStorage.removeItem(storageKey);
+ }catch(_){
+  if(remember||!url)throw Error('無法更新瀏覽器的 API 設定。');
+ }
+ config={url,key};
+}
+async function generate(request,{signal,model}={}){
+ if(!config.url)throw Error('請先設定自訂 API 網址。');
+ const gemini=root.MoonlitGemini.buildGeminiRequest(request,model);
+ const messages=[{role:'system',content:gemini.systemInstruction.parts[0].text}];
+ for(const turn of gemini.contents){
+  const content=turn.parts.map(part=>part.inlineData?{
+   type:'image_url',image_url:{url:'data:'+part.inlineData.mimeType+';base64,'+part.inlineData.data}
+  }:{type:'text',text:part.text});
+  messages.push({role:turn.role==='model'?'assistant':'user',content:content.length===1?content[0].text:content});
+ }
+ const headers={'Content-Type':'application/json'};
+ if(config.key)headers.Authorization='Bearer '+config.key;
+ let response;
+ try{
+  response=await fetch(config.url,{method:'POST',credentials:'omit',referrerPolicy:'no-referrer',redirect:'error',
+   signal,headers,body:JSON.stringify({model,messages,max_tokens:gemini.generationConfig.maxOutputTokens})});
+ }catch(error){
+  if(signal?.aborted)throw new C.ProviderError('已停止回覆。',{code:'cancelled'});
+  throw new C.ProviderError('連不到自訂 API，請確認 HTTPS 網址以及伺服器是否允許這個網頁跨來源連線。',{cause:error});
+ }
+ if(!response.ok)throw Error('自訂 API 回覆 HTTP '+response.status+'。請檢查網址、模型或金鑰。');
+ const responseBody=await response.json();
+ const text=responseBody?.choices?.[0]?.message?.content;
+ if(typeof text!=='string'||!text.trim())throw Error('自訂 API 未回傳可顯示的文字。');
+ return {role:'assistant',content:text.trim(),mock:false};
+}
+C.registerProvider({id:'custom',label:'自訂 API',description:'連線至妳指定的 Chat Completions API。',external:true,
+ models:[{id:'custom-model',label:'請輸入自訂 model ID'}],generate});
+root.LittleCustom={getUrl:()=>config.url,save};
+})(globalThis);
+
+(function(root){
+'use strict';
+function normalize(workspace){
+ const life=workspace.life && typeof workspace.life==='object'?workspace.life:{};
+ workspace.life=life;
+ for(const key of ['posts','diaries','events','records','groups','wallet']){
+  life[key]=Array.isArray(life[key])?life[key].filter(row=>row&&typeof row==='object'&&!Array.isArray(row)).slice(key==='wallet'||key==='records'?-100000:-500):[];
+ }
+ for(const post of life.posts)post.comments=Array.isArray(post.comments)?post.comments.slice(-100):[];
+ for(const group of life.groups){
+  group.members=Array.isArray(group.members)?group.members.slice(0,4):[];
+  group.messages=Array.isArray(group.messages)?group.messages.slice(-160):[];
+ }
+ return life;
+}
+function localDate(date=new Date()){
+ return [date.getFullYear(),date.getMonth()+1,date.getDate()].map((value,index)=>index?String(value).padStart(2,'0'):value).join('-');
+}
+const metrics={water:['喝水','mL',0,20000],sleep:['睡眠','小時',0,24],weight:['體重','kg',0,600]};
+function points(workspace){return workspace.life.wallet.reduce((value,row)=>value+(Number.isInteger(row.amount)?row.amount:0),100);}
+root.LittleLife={normalize,localDate,metrics,points};
+})(globalThis);
+
 (function () {
 'use strict';
 const C=ChatCore, $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -409,12 +589,21 @@ let service,repo,view='chat',busy=false,drawer=false,search='',drafts=new Map(),
 const providerCatalog=()=>C.providerCatalog();
 function modelSettings(){
  const stored=C.normalizeModelSettings(w().settings.model);
- return ['gemini','mock'].includes(stored.provider)?stored:{...stored,provider:'mock',model:'mock-fixed'};
+ return ['gemini','mock','custom'].includes(stored.provider)?stored:{...stored,provider:'mock',model:'mock-fixed'};
 }
 const w=()=>service.workspace, scope=()=>C.scope(w()), draftKey=()=>w().selected.worldId+'/'+(w().selected.threadId||'new');
-const replyDrafts=new Map();
-const roomType=t=>t?.roomType==='phone'?'phone':'room', roomLabel=t=>roomType(t)==='phone'?'手機房':'長聊房', roomTokens=t=>Number.isInteger(t?.maxOutputTokens)?t.maxOutputTokens:modelSettings().maxOutputTokens;
-function renderBubbleContent(content,phone=false){return `<div class="bubble${phone?' phone-segment':''}">${esc(content)}</div>`;}
+const replyDrafts=new Map(),historyCount=new Map();
+let periodMonth;
+const playerDisplay=settings=>settings.playerDisplayName||settings.playerName||'妳';
+const chatTools={
+ sparkle:'M12 2l2.7 7.3L22 12l-7.3 2.7L12 22l-2.7-7.3L2 12l7.3-2.7L12 2Z',
+ photo:'M3 4h18v16H3zM3 17l6-6 4 4 3-3 5 5M16 8h.01',
+ smile:'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0ZM8 10h.01M16 10h.01M7 14q5 6 10 0',
+ gift:'M3 8h18v5H3zM5 13v8h14v-8M12 8v13M12 8C3 9 6 1 9 5l3 3c9 1 6-7 3-3z'
+};
+Object.assign(paths,chatTools);
+
+const roomLabel=()=> '對話';
 function toast(message,error=false){const e=$('#toast');e.textContent=message;e.className='toast visible'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.className='toast',6000);}
 function date(s,opts){const d=new Date(s);return Number.isNaN(+d)?'':d.toLocaleString('zh-TW',opts||{hour:'2-digit',minute:'2-digit',hour12:false});}
 function retainDraft(){const t=$('#message-input');if(t)drafts.set(draftKey(),t.value);}
@@ -430,39 +619,340 @@ function render(){
  $('#app').innerHTML=`<button class="drawer-backdrop ${drawer?'visible':''}" data-action="close-drawer" aria-label="關閉選單"></button><aside class="sidebar ${drawer?'open':''}">
  <div class="brand"><span class="brand-icon">${icon('moon')}</span><div>小倉庫<small>PRIVATE CHAT</small></div><button class="icon-btn mobile-only" data-action="close-drawer" aria-label="關閉選單">${icon('close')}</button></div>
  <div class="sidebar-scroll" data-scope="${world.id}" role="region" aria-label="角色與對話列表" tabindex="0"><div class="character-switch"><label for="character-select">現在，和誰說話</label><div class="select-with-avatar">${avatar(character)}<select id="character-select" aria-label="切換角色">${w().characters.map(c=>`<option value="${c.id}" ${c.id===character.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select><button class="icon-btn" data-action="new-character" title="新增角色" aria-label="新增角色">${icon('plus')}</button></div></div>
- <nav aria-label="主要導覽">${navButton('chat','聊天室','chat')}${navButton('profile','角色與世界','user')}</nav>
+ <nav aria-label="主要導覽">${navButton('chat','聊天室','chat')}${navButton('profile','角色與世界','user')}${navButton('feed','角色日常','book')}${navButton('records','我的紀錄','file')}</nav>
  <div class="thread-heading"><span>這個世界的對話</span><button class="icon-btn" data-action="new-thread" aria-label="新增對話" title="新增對話">${icon('plus')}</button></div>
  <label class="search-box">${icon('search')}<input id="thread-search" placeholder="找一段對話" value="${esc(search)}" aria-label="搜尋目前世界的對話"></label>
- <div class="thread-list">${threads.map(t=>`<button class="thread ${t.id===thread?.id?'selected':''} ${roomType(t)==='phone'?'phone-thread':''}" data-thread="${t.id}"><span>${icon('chat')}</span><div>${esc(t.title)}<small>${roomLabel(t)} · ${date(t.updatedAt,{month:'short',day:'numeric'})}${unread.has(t.id)?' · 未讀':''}</small></div></button>`).join('')||'<div class="list-empty">還沒有對話，<br>從一句話開始就好。</div>'}</div></div>
- <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>iPhone 網頁版</span></div></div></aside>
- <main class="main ${view==='chat'?'chat-mode':''}"><header class="topbar"><button class="icon-btn mobile-only" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button><div class="breadcrumb"><span>${esc(character.name)}</span><span class="slash">/</span><select id="world-select" aria-label="切換世界">${w().worlds.filter(x=>x.characterId===character.id).map(x=>`<option value="${x.id}" ${x.id===world.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div><span class="provider-pill"><i></i>${esc(provider?.label||model.provider)}<span class="wide-text"> · ${esc(model.model)}</span></span><button class="icon-btn context-button" data-action="context" aria-label="查看本次上下文" title="查看本次上下文">${icon('file')}</button></header>
- ${view==='chat'?chatPage(character,world,thread):view==='profile'?profilePage(character,world):settingsPage()}
+ <div class="thread-list">${threads.map(t=>`<button class="thread ${t.id===thread?.id?'selected':''}" data-thread="${t.id}"><span>${icon('chat')}</span><div>${esc(t.title)}<small>${roomLabel(t)} · ${date(t.updatedAt,{month:'short',day:'numeric'})}${unread.has(t.id)?' · 未讀':''}</small></div></button>`).join('')||'<div class="list-empty">還沒有對話，<br>從一句話開始就好。</div>'}</div></div>
+ <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.1</span></div></div></aside>
+ <main class="main ${view==='chat'?'chat-mode messenger':''}"><header class="topbar"><button class="icon-btn mobile-only" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button><div class="breadcrumb"><span>${esc(character.name)}</span><span class="slash">/</span><select id="world-select" aria-label="切換世界">${w().worlds.filter(x=>x.characterId===character.id).map(x=>`<option value="${x.id}" ${x.id===world.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div><span class="provider-pill"><i></i>${esc(provider?.label||model.provider)}<span class="wide-text"> · ${esc(model.model)}</span></span><button class="icon-btn context-button" data-action="context" aria-label="查看本次上下文" title="查看本次上下文">${icon('file')}</button></header>
+ ${view==='chat'?chatPage(character,world,thread):view==='profile'?profilePage(character,world):['feed','records'].includes(view)?lifePage(view,character,world):settingsPage()}
  </main>`;
  $('.sidebar-scroll').scrollTop=sidebarScrollTop;bind();if(view==='chat'){const t=$('#message-input');t.value=drafts.get(draftKey())||'';resizeInput();scrollMessages();}
 }
 function quoteBlock(message){
  return `<blockquote class="quoted-message">${esc(message.content.slice(0,140))}${message.content.length>140?'…':''}</blockquote>`;
 }
-function chatPage(c,world,t){
- const messages=t?w().messages.filter(m=>m.threadId===t.id):[],phone=roomType(t)==='phone',effectiveTokens=t?roomTokens(t):modelSettings().maxOutputTokens;
- const byId=new Map(messages.map(m=>[m.id,m]));
- const composerQuote=byId.get(replyDrafts.get(draftKey()));
- const messageHtml=messages.map(m=>`<article class="message ${m.role}">${m.role==='assistant'?avatar(c,'message-avatar'):''}<div class="message-inner"><div class="message-meta"><span>${esc(m.role==='user'?w().settings.playerName||'妳':c.name)}</span>${m.mock?'<span class="mock-label">固定測試回覆</span>':''}<time>${date(m.createdAt)}</time></div>${byId.has(m.replyTo)?quoteBlock(byId.get(m.replyTo)):''}${renderBubbleContent(m.content,phone)}<button type="button" class="quote-action" data-quote="${m.id}" aria-label="引用這則訊息">引用</button></div></article>`).join('');
- const empty=phone?`<div class="welcome phone-welcome"><div class="welcome-portrait">${avatar(c)}<span>${icon('chat')}</span></div><span class="eyebrow">PHONE ROOM</span><h2>${esc(c.name)}</h2><p>短短地說也可以，這裡比較像手機聊天。</p><div class="welcome-note">${icon('shield')}<span>共用「${esc(world.name)}」的角色與世界資料，<br>這間房的回覆上限預設較短。</span></div></div>`:`<div class="welcome"><div class="welcome-portrait">${avatar(c)}<span>${icon('moon')}</span></div><span class="eyebrow">A LITTLE ROOM FOR YOUR WORDS</span><h2>留一盞燈，慢慢說。</h2><p>${esc(c.description||'今天想從哪裡開始？')}</p><div class="welcome-note">${icon('shield')}<span>${modelSettings().provider==='mock'?'對話留在本機。現在是介面測試，<br>送出後會收到一則固定示範回覆。':'對話留在本機。送出後會由選定的模型回覆。'}</span></div><div class="prompt-chips"><button data-prompt="今天，想先和你說一件小事。">今天的小事 ${icon('chevron')}</button><button data-prompt="我們把下一個故事，慢慢整理好。">整理故事 ${icon('chevron')}</button></div></div>`;
- return `<section class="chat-view ${phone?'phone-room':'long-room'}"><div class="conversation-heading"><div><span class="eyebrow">${esc(world.name)} · ${phone?'PHONE ROOM':'PRIVATE SPACE'}</span><h1>${esc(t?.title||'新的對話')}</h1>${t?`<span class="room-badge">${roomLabel(t)} · ${effectiveTokens} tokens</span>`:''}</div><div class="heading-actions">${t?`<details class="heading-menu"><summary class="icon-btn heading-menu-trigger" aria-label="更多房間操作" title="更多房間操作">⋯</summary><div class="heading-menu-panel"><button type="button" data-action="room-settings">${icon('settings')}<span>房間設定</span></button><button type="button" data-action="mark-unread">標為未讀</button><button type="button" data-action="rename-thread">${icon('edit')}<span>重新命名</span></button><button type="button" data-action="export-thread">${icon('download')}<span>匯出這段對話</span></button><button type="button" class="danger" data-action="delete-thread">${icon('trash')}<span>刪除對話</span></button></div></details>`:''}</div></div>
- <div class="messages" id="messages" role="log" aria-label="聊天紀錄"><div class="message-column">${messages.length?`${phone?'':`<div class="date-divider"><span>${date(messages[0].createdAt,{year:'numeric',month:'long',day:'numeric'})}</span></div>`}${messageHtml}`:empty}</div></div>
- ${sendError?`<div class="send-error" role="alert"><strong>上一則沒有送成功</strong><span>${esc(sendError)}</span></div>`:''}<div class="composer-wrap"><form id="compose-form" class="composer">${composerQuote?`<div class="quote-draft">${quoteBlock(composerQuote)}<button type="button" class="quote-action" id="clear-quote" aria-label="取消引用">取消</button></div>`: ''}<label for="message-input" class="sr-only">訊息</label><textarea id="message-input" rows="1" maxlength="32000" placeholder="${phone?'訊息…':'把想說的話，留在這裡…'}"></textarea><div class="composer-bottom"><span>${icon('shield')}${phone?`手機房 · ${effectiveTokens} tokens`:'僅存於本機'} <span class="desktop-hint">· Enter 送出，Shift + Enter 換行</span></span><button class="send-button" type="submit" aria-label="送出訊息">${icon('send')}</button></div></form></div></section>`;
+function messageBubble(message,character,byId){
+ const received=message.role==='assistant';
+ const quote=byId.get(message.replyTo);
+ const time=date(message.createdAt,{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
+ const media=message.image?`<img class="chat-media" src="${esc(message.image)}" alt="${message.kind==='sticker'?'貼圖':'照片'}">`:'';
+ const label=message.kind==='photo'&&message.content==='傳了一張照片。'||message.kind==='sticker'&&message.image?'':esc(message.content);
+ return `<article class="im-row ${received?'incoming':'outgoing'}">${received?avatar(character,'im-avatar'):w().settings.playerAvatar?avatar({name:playerDisplay(w().settings),avatar:w().settings.playerAvatar},'im-avatar'):''}
+ <div class="im-content">${quote?quoteBlock(quote):''}<div class="im-bubble ${message.kind==='sticker'?'im-sticker':''}">${media}${label}</div>
+ <button type="button" class="quote-action" data-quote="${message.id}" aria-label="引用這則訊息">引用</button></div>
+ <div class="im-meta">${!received&&message.readAt?`<span>已讀 ${esc(date(message.readAt))}</span>`:''}${message.mock?'<span>示範</span>':''}<time>${esc(time)}</time></div></article>`;
 }
-function profilePage(c,world){const refs=w().references.filter(r=>r.worldId===world.id);return `<section class="page-scroll"><div class="page-content"><span class="eyebrow">CHARACTER / WORLD</span><h1>讓每個人，有自己的位置。</h1><p class="page-intro">角色設定可以沿用，世界的記憶各自保存。這裡的欄位都可以改。</p><div class="profile-grid"><div class="card"><div class="card-heading"><h2>角色資料</h2><span class="tag">跨這個角色的世界共用</span></div><form id="character-form"><div class="avatar-editor">${avatar(c,'large')}<div><label class="button secondary upload-label">${icon('upload')}更換頭像<input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" hidden></label><small>PNG / JPG / WebP，1.5 MB 以內</small></div></div><label class="field">名字<input name="name" value="${esc(c.name)}" required maxlength="60"></label><label class="field">一句介紹<input name="description" value="${esc(c.description)}" maxlength="200"></label><label class="field">人設與回應方式<textarea name="persona" rows="8" maxlength="200000">${esc(c.persona)}</textarea><small>起始範本不是完整記憶。可以貼入妳自己的角色設定。</small></label><button class="button primary" type="submit">${icon('check')}儲存角色資料</button></form><div class="card-footer"><button class="text-button" data-action="duplicate-character">${icon('copy')}複製角色設定</button><button class="text-button danger" data-action="delete-character">刪除角色</button></div></div>
+function chatPage(c,world,t){
+ const all=t?w().messages.filter(m=>m.threadId===t.id):[];
+ const messages=all.slice(-(historyCount.get(t?.id)||120));
+ const byId=new Map(all.map(m=>[m.id,m]));
+ const composerQuote=byId.get(replyDrafts.get(draftKey()));
+ return `<section class="chat-view im-page">
+ <header class="im-header"><button type="button" class="icon-btn" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button>
+ <div><h1>${esc(c.name)}</h1><small>${esc(world.name)}${t?' · '+esc(t.title):''}</small></div>
+ <details class="heading-menu"><summary class="icon-btn heading-menu-trigger" aria-label="更多房間操作">⋯</summary><div class="heading-menu-panel">
+ ${t?'<button type="button" data-action="mark-unread">標為未讀</button><button type="button" data-action="rename-thread">重新命名</button><button type="button" data-action="export-thread">匯出對話</button><button type="button" class="danger" data-action="delete-thread">刪除對話</button>':''}
+ <button type="button" data-action="context">查看模型資料</button></div></details></header>
+ <div class="messages" id="messages" role="log" aria-label="聊天紀錄"><div class="message-column">${all.length>messages.length?'<button class="button secondary load-history" data-action="older-messages">載入更早的訊息</button>':''}
+ ${messages.length?messages.map(m=>messageBubble(m,c,byId)).join(''):'<p class="im-empty">還沒有訊息。可以先打個招呼，或點星星讓角色來找妳。</p>'}</div></div>
+ ${sendError?`<p class="send-error" role="alert">${esc(sendError)}</p>`:''}
+ <div class="im-composer-wrap"><form id="compose-form" class="im-composer">
+ ${composerQuote?`<div class="quote-draft">${quoteBlock(composerQuote)}<button type="button" class="quote-action" id="clear-quote">取消引用</button></div>`:''}
+ <div class="im-tools">
+ <button type="button" class="icon-btn" data-action="proactive" aria-label="讓角色傳一則訊息給你">${icon('sparkle')}</button>
+ <button type="button" class="icon-btn" data-action="photo" aria-label="傳照片">${icon('photo')}</button>
+ <button type="button" class="icon-btn" data-action="stickers" aria-label="貼圖">${icon('smile')}</button>
+ <button type="button" class="icon-btn" data-action="gifts" aria-label="禮物">${icon('gift')}</button>
+ <input id="chat-photo-file" type="file" accept="image/*" hidden></div>
+ <label class="sr-only" for="message-input">訊息</label><textarea id="message-input" rows="1" maxlength="32000" placeholder="輸入訊息"></textarea>
+ <button class="send-button" type="submit" aria-label="送出訊息">${icon('send')}</button></form></div></section>`;
+}
+function periodCalendar(records){
+ const today=LittleLife.localDate();
+ const base=periodMonth||new Date();
+ const month=new Date(base.getFullYear(),base.getMonth(),1,12);
+ const first=month.getDay();
+ const days=new Date(month.getFullYear(),month.getMonth()+1,0,12).getDate();
+ const active=new Set(records.filter(row=>row.metric==='period'&&Number(row.value)===1).map(row=>row.date));
+ const label=month.toLocaleDateString('zh-TW',{year:'numeric',month:'long'});
+ const cells=Array.from({length:days},(_,index)=>{
+  const day=index+1;
+  const date=LittleLife.localDate(new Date(month.getFullYear(),month.getMonth(),day,12));
+  return `<button class="calendar-day" type="button" data-period-date="${date}" aria-label="${date} 經期" aria-pressed="${active.has(date)}"${date===today?' aria-current="date"':''}>${day}</button>`;
+ }).join('');
+ return `<section class="life-card period-calendar"><h2>經期日曆</h2>
+ <div class="calendar-header">
+ <button type="button" class="icon-btn" aria-label="上個月" data-period-month="-1">‹</button>
+ <strong aria-live="polite">${esc(label)}</strong>
+ <button type="button" class="icon-btn" aria-label="下個月" data-period-month="1">›</button></div>
+ <div class="calendar-grid">${['日','一','二','三','四','五','六'].map(day=>`<span aria-hidden="true">${day}</span>`).join('')}
+ ${'<span aria-hidden="true"></span>'.repeat(first)}${cells}</div>
+ <p class="hint">點日期標記經期，再點同一天取消。紀錄留在此裝置，可隨完整備份匯出。</p></section>`;
+}
+function restoreCalendarPosition(scrollTop,selector){
+ const pane=$('.life-page');
+ if(pane)pane.scrollTop=scrollTop;
+ $(selector)?.focus({preventScroll:true});
+}
+function lifePage(route,character,world){
+ const life=w().life;
+ if(route==='records'){
+  const dateValue=LittleLife.localDate();
+  const chart=Object.entries(LittleLife.metrics).map(([id,[label,unit]])=>{
+   const rows=life.records.filter(row=>row.metric===id).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,7);
+   const max=Math.max(1,...rows.map(row=>Number(row.value)||0));
+   return `<section class="life-card"><h3>${label}</h3>${rows.map(row=>`<div class="trend-row"><time>${esc(row.date)}</time><meter min="0" max="${max}" value="${Math.max(0,Number(row.value)||0)}"></meter><span>${esc(row.value)+esc(unit)}</span></div>`).join('')||'<p>還沒有紀錄</p>'}</section>`;
+  }).join('');
+  return `<section class="page-scroll life-page"><h1>我的紀錄</h1>${periodCalendar(life.records)}<form id="record-form" class="life-card">
+  <label class="field">日期<input name="date" type="date" value="${dateValue}" required></label>
+  <label class="field">項目<select name="metric">${Object.entries(LittleLife.metrics).map(([id,[label,unit]])=>`<option value="${id}">${label}${unit?'（'+unit+'）':''}</option>`).join('')}</select></label>
+  <label class="field" id="record-value-label">數值<input name="value" type="number" min="0" max="20000" step="any" required></label>
+  <button class="button primary" type="submit">儲存</button></form>${chart}</section>`;
+ }
+ const posts=life.posts.filter(row=>row.worldId===world.id);
+ const diary=life.diaries.filter(row=>row.worldId===world.id);
+ const events=life.events.filter(row=>row.worldId===world.id);
+ const groups=life.groups.filter(row=>row.worldId===world.id);
+ return `<section class="page-scroll life-page"><h1>角色日常</h1><p>${esc(character.name)} · ${esc(world.name)}</p>
+ <section class="life-card"><h2>動態</h2><div class="button-row"><button class="button secondary" data-action="new-post">發動態</button><button class="button secondary" data-action="role-post">讓角色發動態</button></div>
+ ${posts.slice(-20).reverse().map(row=>`<article><strong>${esc(row.author)}</strong><p>${esc(row.text)}</p>
+ ${row.comments.map(comment=>`<p class="life-comment"><strong>${esc(comment.author)}</strong> ${esc(comment.text)}</p>`).join('')}
+ <button class="button secondary" data-life-comment="${esc(row.id)}">留言</button>
+ <button class="button secondary" data-life-role-comment="${esc(row.id)}">讓角色留言</button></article>`).join('')}</section>
+ <section class="life-card"><h2>角色日記</h2><button class="button secondary" data-action="role-diary">寫一篇今日日記</button>
+ ${diary.slice(-14).reverse().map(row=>`<article><time>${esc(row.date)}</time><p>${esc(row.text)}</p></article>`).join('')}</section>
+ <section class="life-card"><h2>開啟小倉庫時自動更新</h2><form id="routine-form">
+ <label class="checkbox"><input type="checkbox" name="post" ${world.dailyPost===true?'checked':''}>每天讓角色發一則動態</label>
+ <label class="checkbox"><input type="checkbox" name="diary" ${world.dailyDiary===true?'checked':''}>每天讓角色寫一篇日記</label>
+ <button class="button secondary" type="submit">儲存自動更新</button></form></section>
+ <section class="life-card"><h2>行程與紀念日</h2><button class="button secondary" data-action="new-event">新增日期或行程</button>
+ ${events.map(row=>`<p><time>${esc(row.date)}</time> ${esc(row.text)}${row.annual===true?' · 每年':''}</p>`).join('')}</section>
+ <section class="life-card"><h2>角色群聊</h2><button class="button secondary" data-action="new-group">建立群聊</button>
+ ${groups.map(group=>`<article><h3>${esc(group.title)}</h3>${group.messages.slice(-20).map(message=>`<p><strong>${esc(message.author)}</strong> ${esc(message.text)}</p>`).join('')}
+ <button class="button secondary" data-group-send="${esc(group.id)}">傳訊</button>
+ <button class="button secondary" data-group-roles="${esc(group.id)}">讓角色自己聊</button><button class="button secondary" data-group-manage="${esc(group.id)}">管理群聊</button></article>`).join('')}</section>
+ <section class="life-card"><h2>虛擬錢包</h2><p>餘額 ${LittleLife.points(w())} 點</p><button class="button secondary" data-action="ask-gift">跟角色討禮物</button>
+ ${life.wallet.slice(-10).reverse().map(row=>`<p>${esc(row.text)} · ${row.amount>0?'+':''}${esc(row.amount)}</p>`).join('')}</section></section>`;
+}
+function bindLife(){
+ for(const button of document.querySelectorAll('[data-period-month]')){
+  button.onclick=()=>{
+   const step=Number(button.dataset.periodMonth),scrollTop=$('.life-page').scrollTop;
+   const base=periodMonth||new Date();
+   periodMonth=new Date(base.getFullYear(),base.getMonth()+step,1,12);
+   render();
+   restoreCalendarPosition(scrollTop,'[data-period-month="'+step+'"]');
+  };
+ }
+ for(const button of document.querySelectorAll('[data-period-date]')){
+  button.onclick=async()=>{
+   if(busy)return;
+   const date=button.dataset.periodDate,marked=button.getAttribute('aria-pressed')==='true',scrollTop=$('.life-page').scrollTop;
+   button.disabled=true;
+   await change(d=>{
+    d.life.records=d.life.records.filter(row=>row.metric!=='period'||row.date!==date);
+    if(!marked)d.life.records.push({date,metric:'period',value:1});
+   },marked?'經期標記已取消。':'經期已標記。');
+   restoreCalendarPosition(scrollTop,'[data-period-date="'+date+'"]');
+  };
+ }
+
+ const routine=$('#routine-form');
+ if(routine)routine.onsubmit=async event=>{
+  event.preventDefault();
+  const {world}=scope(),form=new FormData(routine);
+  if(await change(d=>{
+   const current=d.worlds.find(row=>row.id===world.id);
+   current.dailyPost=form.has('post');
+   current.dailyDiary=form.has('diary');
+  },'日常更新設定已儲存。')){dailyAttempt='';runDailyLife();}
+ };
+ for(const button of document.querySelectorAll('[data-group-manage]')){
+  button.onclick=()=>manageGroup(button.dataset.groupManage);
+ }
+ const record=$('#record-form');
+ if(record){
+  const metric=record.elements.metric,value=record.elements.value;
+  const update=()=>{
+   const [, ,min,max]=LittleLife.metrics[metric.value];
+   value.min=min;value.max=max;
+  };
+  metric.onchange=update;update();
+  record.onsubmit=async event=>{
+   event.preventDefault();
+   const data=new FormData(record),date=data.get('date'),metric=data.get('metric');
+   const value=Number(data.get('value'));
+   await change(d=>{
+    const records=d.life.records;
+    const row=records.find(r=>r.date===date&&r.metric===metric);
+    if(row)row.value=value;else records.push({date,metric,value});
+   },'已儲存紀錄。');
+  };
+ }
+ for(const button of document.querySelectorAll('[data-life-comment],[data-life-role-comment]')){
+  button.onclick=()=>commentOnPost(button.dataset.lifeComment||button.dataset.lifeRoleComment,!!button.dataset.lifeRoleComment);
+ }
+ for(const button of document.querySelectorAll('[data-group-send],[data-group-roles]')){
+  button.onclick=()=>groupMessage(button.dataset.groupSend||button.dataset.groupRoles,!!button.dataset.groupRoles);
+ }
+}
+async function lifeText(workspace,instruction,character,history=[]){
+ const model=modelSettings(),provider=C.providers.get(model.provider);
+ if(model.provider==='mock')return '（示範）'+character.name+'：今天想把這件小事記下來。';
+ const request=C.context(workspace);
+ request.character={name:character.name,persona:character.persona};
+ if(character.id!==workspace.selected.characterId||history.length){
+  request.world={name:'群聊'};
+  request.references=[];request.messages=history;
+ }
+ request.messages=request.messages.map(({role,content})=>({role,content}));
+ request.request.maxOutputTokens=600;
+ request.messages.push({role:'user',content:instruction});
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),35000);
+ try{
+  const result=await C.generateWithRetry(provider,request,{signal:controller.signal,model:model.model});
+  if(!result.content.trim())throw Error('角色沒有回覆。');
+  return result.content.trim().slice(0,2000);
+ }finally{clearTimeout(timer);}
+}
+async function commentOnPost(id,role){
+ const {character}=scope(),post=w().life.posts.find(row=>row.id===id);
+ if(!post||busy)return;
+ const append=(d,author,text)=>d.life.posts.find(row=>row.id===id).comments.push({author,text});
+ if(role){
+  await change(async d=>append(d,character.name,await lifeText(d,'請對這則動態留一則簡短留言：'+post.text,character)),'留言已加入。');
+  return;
+ }
+ modal('留言',inputField('留言','text'),{submit:async data=>{
+  if(!await change(d=>append(d,playerDisplay(d.settings),String(data.get('text')).trim())))throw Error('沒有存好留言。');
+ }});
+}
+function groupMessage(id,rolesOnly){
+ if(busy)return;
+ const send=async text=>{
+  if(!await change(async d=>{
+   const group=d.life.groups.find(row=>row.id===id);
+   if(text)group.messages.push({author:playerDisplay(d.settings),text,role:'user'});
+   for(const member of group.members){
+    const character=d.characters.find(c=>c.id===member);
+    if(!character)continue;
+    const history=group.messages.slice(-14).map(row=>({role:'user',content:row.author+'：'+row.text}));
+    if(!history.length)history.push({role:'user',content:'群聊剛開始。'});
+    const answer=await lifeText(d,'你正在群聊。依據群聊內容發一則自然的訊息。',character,history);
+    group.messages.push({author:character.name,text:answer,role:'assistant'});
+   }
+  }))throw Error('沒有存好群聊。');
+ };
+ if(rolesOnly){send('').catch(()=>{});return;}
+ modal('群聊訊息',inputField('輸入訊息','text'),{submit:data=>send(String(data.get('text')).trim())});
+}
+async function manageGroup(id){
+ if(busy)return;
+ modal('管理群聊',`<label class="field">操作<select name="operation"><option value="clear">清空訊息</option><option value="delete">刪除群聊</option></select></label>`,
+ {label:'確定',danger:true,submit:async form=>{
+  if(!await change(d=>{
+   if(form.get('operation')==='delete')d.life.groups=d.life.groups.filter(group=>group.id!==id);
+   else d.life.groups.find(group=>group.id===id).messages=[];
+  }))throw Error('沒有完成操作。');
+ }});
+}
+let dailyAttempt='';
+async function runDailyLife(){
+ if(!service||busy||document.hidden||$('#modal').open)return;
+ const {world,character}=scope(),today=LittleLife.localDate();
+ if(!world.dailyPost&&!world.dailyDiary)return;
+ const key=world.id+':'+today;
+ if(dailyAttempt===key)return;
+ const tasks=[];
+ if(world.dailyPost&&!w().life.posts.some(row=>row.worldId===world.id&&row.date===today&&row.automatic===true)){
+  tasks.push(['posts','請發一則短短的日常動態。']);
+ }
+ if(world.dailyDiary&&!w().life.diaries.some(row=>row.worldId===world.id&&row.date===today)){
+  tasks.push(['diaries','請寫今天的一小段第一人稱日記。']);
+ }
+ if(!tasks.length)return;
+ dailyAttempt=key;
+ for(const [collection,instruction] of tasks){
+  if(scope().world.id!==world.id||document.hidden)break;
+  await change(async d=>{
+   const text=await lifeText(d,instruction,character);
+   d.life[collection].push({id:C.id(),worldId:world.id,author:character.name,date:today,text,automatic:true,comments:[]});
+  });
+ }
+}
+async function lifeAction(name,character,world){
+ const worldId=world.id,today=LittleLife.localDate();
+ const worldRow=(d,key,values)=>d.life[key].push({id:C.id(),worldId,...values});
+ if(name==='new-post'){
+  modal('發動態',inputField('內容','text','',4),{submit:async data=>{
+   const text=String(data.get('text')).trim().slice(0,2000);if(!text)throw Error('請輸入內容。');
+   if(!await change(d=>worldRow(d,'posts',{author:playerDisplay(d.settings),text,comments:[]})))throw Error('沒有存好動態。');
+  }});return true;
+ }
+ if(name==='role-post'||name==='role-diary'){
+  const diary=name==='role-diary',key=diary?'diaries':'posts';
+  if(diary&&w().life.diaries.some(row=>row.worldId===worldId&&row.date===today)){toast('今天的日記已經寫好了。');return true;}
+  await change(async d=>{
+   const text=await lifeText(d,diary?'請寫今天的一小段第一人稱私密日記。':'請發一則簡短的日常動態。',character);
+   worldRow(d,key,{author:character.name,text,date:today,comments:[]});
+  },diary?'日記已存好。':'動態已發出。');return true;
+ }
+ if(name==='new-event'){
+  modal('新增行程或紀念日',`<label class="field">日期<input type="date" name="date" value="${today}" required></label>`+inputField('名稱','text')+'<label class="checkbox"><input type="checkbox" name="annual">每年紀念日</label>',{
+   submit:async data=>{if(!await change(d=>worldRow(d,'events',{date:data.get('date'),text:String(data.get('text')).trim(),annual:data.has('annual')})))throw Error('沒有存好行程。');}
+  });return true;
+ }
+ if(name==='new-group'){
+  if(w().characters.length<2){toast('先在「角色與世界」建立至少兩個角色。');return true;}
+  const choices=w().characters.map(c=>`<label class="checkbox"><input type="checkbox" name="member" value="${esc(c.id)}"> ${esc(c.name)}</label>`).join('');
+  modal('建立群聊',inputField('群聊名稱','title')+choices,{submit:async data=>{
+   const members=data.getAll('member');
+   if(members.length<2||members.length>4)throw Error('請選 2 到 4 位角色。');
+   if(!await change(d=>worldRow(d,'groups',{title:String(data.get('title')).trim(),members,messages:[]})))throw Error('沒有存好群聊。');
+  }});return true;
+ }
+ if(name==='ask-gift'){
+  modal('跟角色討禮物',inputField('想要什麼','gift'),{submit:async data=>{
+   if(!await change(async d=>{
+    const answer=await lifeText(d,'對方想要這個禮物：'+String(data.get('gift')).trim()+'。依角色設定自然回應。若你決定贈送虛擬點數，回覆最前面輸出 [送點數]，否則直接回覆。',character);
+    const accepted=answer.startsWith('[送點數]');
+    const text=(accepted?answer.slice('[送點數]'.length):answer).trim();
+    d.life.wallet.push({text:character.name+'：'+text,amount:accepted?10:0});
+   }))throw Error('沒有存好禮物訊息。');
+  }});return true;
+ }
+ return false;
+}
+
+function profilePage(c,world){const refs=w().references.filter(r=>r.worldId===world.id);return `<section class="page-scroll"><div class="page-content"><span class="eyebrow">CHARACTER / WORLD</span><h1>讓每個人，有自己的位置。</h1><p class="page-intro">角色設定可以沿用，世界的記憶各自保存。這裡的欄位都可以改。</p><div class="profile-grid"><div class="card"><div class="card-heading"><h2>角色資料</h2><span class="tag">跨這個角色的世界共用</span></div><form id="character-form"><div class="avatar-editor">${avatar(c,'large')}<div><label class="button secondary upload-label">${icon('upload')}更換頭像<input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" hidden></label><small>PNG / JPG / WebP，1.5 MB 以內</small></div></div><label class="field">名字<input name="name" value="${esc(c.name)}" required maxlength="60"></label><label class="field">一句介紹<input name="description" value="${esc(c.description)}" maxlength="200"></label><label class="field">人設與回應方式<textarea name="persona" rows="8" maxlength="200000">${esc(c.persona)}</textarea><small>起始範本不是完整記憶。可以貼入妳自己的角色設定。</small></label><label class="field">回覆節奏<select name="pace">${[['fast','即時'],['steady','自然'],['slow','慢一點']].map(([value,label])=>`<option value="${value}" ${c.pace===value?'selected':''}>${label}</option>`).join('')}</select></label><button class="button primary" type="submit">${icon('check')}儲存角色資料</button></form><div class="card-footer"><button class="text-button" data-action="duplicate-character">${icon('copy')}複製角色設定</button><button class="text-button danger" data-action="delete-character">刪除角色</button></div></div>
  <div><div class="card"><div class="card-heading"><h2>世界 / IF 線</h2><button class="text-button" data-action="new-world">${icon('plus')}新增</button></div><div class="world-list">${w().worlds.filter(x=>x.characterId===c.id).map(x=>`<button class="world-item ${x.id===world.id?'active':''}" data-world="${x.id}"><span class="world-symbol">${icon('moon')}</span><div>${esc(x.name)}<small>${w().threads.filter(t=>t.worldId===x.id).length} 段對話 · 獨立記憶</small></div>${x.id===world.id?icon('check'):icon('chevron')}</button>`).join('')}</div><div class="button-row"><button class="button secondary" data-action="edit-world">${icon('edit')}編輯「${esc(world.name)}」</button><button class="button secondary" data-action="export-world-story">${icon('download')}匯出這個世界劇情</button></div></div>
  <div class="card reference-card"><div class="card-heading"><h2>參考資料</h2><span class="tag">只給 ${esc(world.name)}</span></div><p>純文字與 Markdown，保留原文。不會自動讀取其他世界的檔案。</p><div class="reference-list">${refs.map(r=>`<div class="reference-item">${icon('file')}<button class="reference-name" data-reference="${r.id}">${esc(r.name)}<small>${r.content.length.toLocaleString()} 字</small></button><button class="icon-btn" data-remove-reference="${r.id}" aria-label="刪除 ${esc(r.name)}">${icon('trash')}</button></div>`).join('')||'<div class="soft-empty">還沒有參考資料</div>'}</div><label class="button secondary full upload-label">${icon('plus')}一次加入 TXT / MD<input type="file" id="reference-file" accept=".txt,.md,text/plain,text/markdown" multiple hidden></label><small class="hint">可多選（Ctrl／Shift）；每份 1 MB、250,000 字以內。只在本機保存。</small></div></div></div></div></section>`;}
-function settingsPage(){const catalog=providerCatalog(),model=modelSettings(),provider=catalog.find(p=>p.id===model.provider)||catalog[0],models=provider?.models||[{id:model.model,label:model.model}],knownModel=models.some(x=>x.id===model.model),customModel=knownModel?'':model.model;return `<section class="page-scroll"><div class="page-content settings-content"><span class="eyebrow">SETTINGS / KEEP A COPY</span><h1>把這個房間，照顧好。</h1><p class="page-intro">聊天存在這台裝置。想用 Gemini 真正回覆，可以在下方加入自己的 API 金鑰。</p><div class="card"><div class="card-heading"><h2>妳的偏好</h2></div><form id="settings-form" class="settings-form"><label class="field">聊天中的稱呼<input name="playerName" maxlength="60" value="${esc(w().settings.playerName)}" placeholder="妳"></label><label class="field">閱讀字級<select name="fontSize">${[15,16,18,20].map(n=>`<option value="${n}" ${w().settings.fontSize===n?'selected':''}>${n}px</option>`).join('')}</select></label><button class="button primary" type="submit">儲存偏好</button></form></div>
+function settingsPage(){const catalog=providerCatalog(),model=modelSettings(),provider=catalog.find(p=>p.id===model.provider)||catalog[0],models=provider?.models||[{id:model.model,label:model.model}],knownModel=models.some(x=>x.id===model.model),customModel=knownModel?'':model.model;return `<section class="page-scroll"><div class="page-content settings-content"><h1>設定與備份</h1>
+ <div class="card"><div class="card-heading"><h2>我的個人檔案</h2></div>
+ <form id="player-profile-form">
+ <div class="player-profile-avatar">${avatar({name:playerDisplay(w().settings),avatar:w().settings.playerAvatar},'large')}
+ <label class="button secondary upload-label">更換頭像<input type="file" id="player-avatar-file" accept="image/*" hidden></label>
+ ${w().settings.playerAvatar?'<button class="text-button" type="button" data-action="clear-player-avatar">移除頭像</button>':''}</div>
+ <label class="field">我的名字<input name="displayName" maxlength="60" value="${esc(w().settings.playerDisplayName||(w().settings.playerName==='妳'?'':w().settings.playerName))}" placeholder="名字或暱稱"></label>
+ <label class="field">希望角色怎麼稱呼我<input name="playerName" maxlength="60" value="${esc(w().settings.playerNickname)}" placeholder="留空時用我的名字"></label>
+ <p class="hint">稱呼會提供給選用的模型。頭像只用於顯示，個人檔案會隨完整備份匯出。</p>
+ <button class="button primary" type="submit">儲存個人檔案</button></form></div>
+ <div class="card"><div class="card-heading"><h2>閱讀偏好</h2></div><form id="settings-form" class="settings-form"><label class="field">閱讀字級<select name="fontSize">${[15,16,18,20].map(n=>`<option value="${n}" ${w().settings.fontSize===n?'selected':''}>${n}px</option>`).join('')}</select></label><button class="button primary" type="submit">儲存偏好</button></form></div>
  <div class="card"><div class="card-heading"><h2>Gemini 金鑰</h2><span class="tag">${MoonlitWeb.hasKey()?'已設定':'尚未設定'}</span></div><form id="gemini-key-form"><label class="field">Gemini API 金鑰<input name="key" required type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="200"></label><label class="checkbox"><input name="remember" type="checkbox">在這台裝置記住金鑰</label><p class="hint">若未勾選，重新開啟網頁可能需要再次輸入。金鑰只供這個瀏覽器連線 Google，且不會放進聊天備份。</p><div class="button-row"><button class="button primary" type="submit">儲存金鑰</button>${MoonlitWeb.hasKey()?'<button type="button" class="button secondary" data-action="clear-gemini-key">清除金鑰</button>':''}</div></form></div>
- <div class="card"><div class="card-heading"><h2>模型連線</h2><span class="tag">Mock / Gemini</span></div><form id="model-settings-form" class="settings-form"><label class="field">Provider<select id="provider-select" name="provider">${catalog.map(p=>`<option value="${esc(p.id)}" ${p.id===model.provider?'selected':''}>${esc(p.label)}</option>`).join('')}</select></label><label class="field">模型<select id="model-select" name="model">${models.map(x=>`<option value="${esc(x.id)}" ${x.id===model.model?'selected':''}>${esc(x.label)}</option>`).join('')}<option value="__custom__" ${!knownModel?'selected':''}>自訂 model ID…</option></select></label><label class="field">自訂 model ID<input id="custom-model-input" name="customModel" maxlength="120" value="${esc(customModel)}" placeholder="例如：gpt-6.2-sol"><small>只有選「自訂 model ID…」時使用。限英數、-、_、.；請貼服務商官方 model ID。</small></label><label class="field">長聊房回覆上限<select name="maxOutputTokens">${[[80,'一句／很短'],[150,'極短訊息'],[300,'LINE／自然短聊'],[600,'日常聊天'],[1200,'長聊天'],[1800,'標準長文'],[2500,'劇情'],[3000,'長篇劇情'],[4000,'超長']].map(([n,label])=>`<option value="${n}" ${model.maxOutputTokens===n?'selected':''}>${n} tokens · ${label}</option>`).join('')}</select></label><label class="field">最近對話帶入數<select name="contextMessages">${[10,20,30,50].map(n=>`<option value="${n}" ${model.contextMessages===n?'selected':''}>${n} 則</option>`).join('')}</select></label><label class="field">暫時錯誤重試<select name="retryCount">${[0,1,2].map(n=>`<option value="${n}" ${model.retryCount===n?'selected':''}>${n===0?'不自動重試':n+' 次'}</option>`).join('')}</select></label><button class="button primary" type="submit">儲存模型設定</button></form><div class="provider-row"><span class="provider-symbol">${icon('moon')}</span><div><strong>${esc(provider?.label||model.provider)}</strong><p>${esc(provider?.description||'目前沒有載入這個 Provider。')}</p></div><span class="connected">${provider?.external?'外部服務':'本機測試'}</span></div><p class="hint">外部 Provider 只會把目前角色、目前世界、該世界參考資料與最近 N 則訊息送到妳選擇的服務商。手機房會使用該房自己的短回覆上限（預設 300 tokens），長聊房則使用上方設定。金鑰不包含在工作區和備份。</p></div>
+ <div class="card"><div class="card-heading"><h2>自訂 API</h2></div>
+ <form id="custom-api-form"><label class="field">Chat Completions 完整網址<input name="url" type="url" value="${esc(LittleCustom.getUrl())}" required placeholder="https://你的伺服器/v1/chat/completions"></label>
+ <label class="field">API 金鑰（選填）<input name="key" type="password" autocomplete="off"></label>
+ <label class="field">模型 ID<input name="model" required maxlength="120" value="${model.provider==='custom'?esc(model.model):''}"></label>
+ <label class="checkbox"><input name="remember" type="checkbox">在這台裝置記住設定與金鑰</label>
+ <p class="hint">聊天上下文和最近的圖片會送到妳填的網址。只使用妳信任、支援跨來源連線的 HTTPS 伺服器。</p>
+ <div class="button-row"><button class="button secondary" type="submit">使用自訂 API</button>${LittleCustom.getUrl()?'<button class="button secondary" type="button" data-action="clear-custom-api">清除自訂 API</button>':''}</div></form></div>
+ <div class="card"><div class="card-heading"><h2>模型連線</h2><span class="tag">Mock / Gemini / 自訂 API</span></div><form id="model-settings-form" class="settings-form"><label class="field">Provider<select id="provider-select" name="provider">${catalog.map(p=>`<option value="${esc(p.id)}" ${p.id===model.provider?'selected':''}>${esc(p.label)}</option>`).join('')}</select></label><label class="field">模型<select id="model-select" name="model">${models.map(x=>`<option value="${esc(x.id)}" ${x.id===model.model?'selected':''}>${esc(x.label)}</option>`).join('')}<option value="__custom__" ${!knownModel?'selected':''}>自訂 model ID…</option></select></label><label class="field">自訂 model ID<input id="custom-model-input" name="customModel" maxlength="120" value="${esc(customModel)}" placeholder="例如：gpt-6.2-sol"><small>只有選「自訂 model ID…」時使用。限英數、-、_、.；請貼服務商官方 model ID。</small></label><label class="field">模型回覆上限<select name="maxOutputTokens">${[[80,'一句／很短'],[150,'極短訊息'],[300,'自然短訊息'],[600,'日常聊天'],[1200,'長聊天'],[1800,'標準長文'],[2500,'劇情'],[3000,'長篇劇情'],[4000,'超長']].map(([n,label])=>`<option value="${n}" ${model.maxOutputTokens===n?'selected':''}>${n} tokens · ${label}</option>`).join('')}</select></label><label class="field">最近對話帶入數<select name="contextMessages">${[10,20,30,50].map(n=>`<option value="${n}" ${model.contextMessages===n?'selected':''}>${n} 則</option>`).join('')}</select></label><label class="field">暫時錯誤重試<select name="retryCount">${[0,1,2].map(n=>`<option value="${n}" ${model.retryCount===n?'selected':''}>${n===0?'不自動重試':n+' 次'}</option>`).join('')}</select></label><button class="button primary" type="submit">儲存模型設定</button></form><div class="provider-row"><span class="provider-symbol">${icon('moon')}</span><div><strong>${esc(provider?.label||model.provider)}</strong><p>${esc(provider?.description||'目前沒有載入這個 Provider。')}</p></div><span class="connected">${provider?.external?'外部服務':'本機測試'}</span></div><p class="hint">外部 Provider 只會把目前角色、目前世界、該世界參考資料與最近 N 則訊息送到妳選擇的服務商。聊天室以短訊息方式回覆。金鑰不包含在工作區和備份。</p></div>
  <div class="card"><div class="card-heading"><h2>完整備份</h2><span class="tag">聊天室資料</span></div><p>包含全部角色的聊天、人設、世界／IF 記憶、參考資料與模型偏好。故事館已獨立保存，不會混進這份備份。匯入會取代目前整份聊天室資料。</p><div class="button-row"><button class="button primary" data-action="export-backup">${icon('download')}匯出整包備份</button><label class="button secondary upload-label">${icon('upload')}還原備份<input id="backup-file" type="file" accept=".json,application/json" hidden></label></div><div class="notice">瀏覽器資料可能被清除，也不會在不同裝置自動同步。請定期把備份檔另存一份。</div></div>
  <div class="card"><div class="card-heading"><h2>角色資料包</h2><span class="tag">只搬目前角色</span></div><p>預設只帶人設、頭像、世界設定與參考資料。共同記憶和聊天紀錄預設不帶。</p><label class="checkbox"><input id="include-history" type="checkbox">一併帶走這個角色的世界記憶與聊天</label><div class="button-row"><button class="button secondary" data-action="export-character">${icon('download')}匯出角色包</button><button class="button secondary" data-action="export-character-story">${icon('download')}匯出角色全部劇情</button><label class="button secondary upload-label">${icon('upload')}加入角色包<input id="package-file" type="file" accept=".json,application/json" hidden></label></div><small class="hint">參考資料會隨設定匯出；若裡面有私人經歷，請自行檢查。匯入角色包會新增角色，不會覆蓋現有角色。</small></div>
  <div class="storage-footer">${icon('shield')}<div><strong>${esc(repo.name)}</strong><span>${w().characters.length} 位角色 · ${w().worlds.length} 個世界 · ${w().messages.length} 則訊息</span></div><span class="version">WEB</span></div></div></section>`;}
 function bind(){
+ bindLife();
  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{retainDraft();view=b.dataset.view;drawer=false;render();if(view==='chat')markCurrentThreadRead();});
  document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>action(b.dataset.action));
  $('#character-select').onchange=e=>selectCharacter(e.target.value);
@@ -487,10 +977,27 @@ function bind(){
   render();
   $('#message-input').focus();
  };
+ if($('#chat-photo-file'))$('#chat-photo-file').onchange=async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  const target=draftKey();
+  try{const image=await resizeChatImage(file);if(target===draftKey())await submitMessage('傳了一張照片。',{kind:'photo',image});}
+  catch(error){toast(error.message,true);}
+ };
  if($('#compose-form')){$('#compose-form').onsubmit=send;$('#message-input').oninput=()=>{drafts.set(draftKey(),$('#message-input').value);resizeInput();};$('#message-input').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();send(e);}};}
- if($('#character-form')){$('#character-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),cid=scope().character.id;await change(d=>Object.assign(d.characters.find(c=>c.id===cid),{name:String(f.get('name')).trim(),description:String(f.get('description')),persona:String(f.get('persona'))}),'角色資料已儲存');};$('#avatar-file').onchange=uploadAvatar;$('#reference-file').onchange=uploadReference;}
+ if($('#character-form')){$('#character-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),cid=scope().character.id;await change(d=>Object.assign(d.characters.find(c=>c.id===cid),{name:String(f.get('name')).trim(),description:String(f.get('description')),persona:String(f.get('persona')),pace:String(f.get('pace'))}),'角色資料已儲存');};$('#avatar-file').onchange=uploadAvatar;$('#reference-file').onchange=uploadReference;}
  document.querySelectorAll('[data-reference]').forEach(b=>b.onclick=()=>{const r=w().references.find(r=>r.id===b.dataset.reference);modal('參考資料 · '+r.name,`<pre class="context-text">${esc(r.content)}</pre>`,{label:'關閉'});});
  document.querySelectorAll('[data-remove-reference]').forEach(b=>b.onclick=async()=>{const r=w().references.find(r=>r.id===b.dataset.removeReference);if(await confirmDialog('移除參考資料？',`只移除「${esc(r.name)}」，不會刪除原始檔案。`,'移除'))await change(d=>{d.references=d.references.filter(x=>x.id!==r.id);},'參考資料已移除');});
+ const customAPI=$('#custom-api-form');
+ if(customAPI)customAPI.onsubmit=async event=>{
+  event.preventDefault();
+  const form=new FormData(customAPI),model=String(form.get('model')).trim();
+  try{
+   if(!/^[-a-zA-Z0-9_./:]{1,120}$/.test(model))throw Error('請輸入有效的模型 ID。');
+   LittleCustom.save(String(form.get('url')).trim(),String(form.get('key')).trim(),form.has('remember'));
+   await change(d=>{d.settings.model={...d.settings.model,provider:'custom',model};},'自訂 API 已儲存。');
+  }catch(error){toast(error.message,true);}
+ };
  if($('#gemini-key-form')){
   $('#gemini-key-form').onsubmit=async event=>{
    event.preventDefault();
@@ -503,7 +1010,32 @@ function bind(){
    }catch(error){toast(error.message,true);}
   };
  }
- if($('#settings-form')){$('#settings-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);await change(d=>{d.settings.playerName=String(f.get('playerName')).trim()||'妳';d.settings.fontSize=Number(f.get('fontSize'));},'偏好已儲存');};$('#backup-file').onchange=importBackup;$('#package-file').onchange=importPackage;}
+ const playerProfile=$('#player-profile-form');
+ if(playerProfile){
+  playerProfile.onsubmit=async event=>{
+   event.preventDefault();
+   const form=new FormData(playerProfile);
+   const displayName=String(form.get('displayName')).trim();
+   const name=String(form.get('playerName')).trim();
+   await change(d=>{
+    d.settings.playerDisplayName=displayName;
+    d.settings.playerNickname=name;
+    d.settings.playerName=name||displayName||'妳';
+   },'個人檔案已儲存。');
+  };
+  $('#player-avatar-file').onchange=async event=>{
+   const file=event.target.files[0];if(!file)return;
+   const fields={displayName:playerProfile.elements.displayName.value,playerName:playerProfile.elements.playerName.value};
+   try{
+    const image=await resizeChatImage(file);
+    if(await change(d=>{d.settings.playerAvatar=image;},'我的頭像已更新。')){
+     const updated=$('#player-profile-form');
+     if(updated)for(const [name,value] of Object.entries(fields))updated.elements[name].value=value;
+    }
+   }catch(error){toast(error.message,true);}
+  };
+ }
+ if($('#settings-form')){$('#settings-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);await change(d=>{d.settings.fontSize=Number(f.get('fontSize'));},'偏好已儲存');};$('#backup-file').onchange=importBackup;$('#package-file').onchange=importPackage;}
  if($('#model-settings-form')){const providerSelect=$('#provider-select'),modelSelect=$('#model-select'),customInput=$('#custom-model-input');providerSelect.onchange=()=>{const p=providerCatalog().find(x=>x.id===providerSelect.value),models=p?.models||[];modelSelect.innerHTML=models.map((x,i)=>`<option value="${esc(x.id)}" ${i===0?'selected':''}>${esc(x.label)}</option>`).join('')+'<option value="__custom__">自訂 model ID…</option>';customInput.value='';};$('#model-settings-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),selected=String(f.get('model')),custom=String(f.get('customModel')||'').trim(),chosen=selected==='__custom__'?custom:selected;if(!/^[-a-zA-Z0-9_.]{1,120}$/.test(chosen))throw toast('自訂 model ID 格式不正確。請只使用英數、-、_、.。',true);await change(d=>{d.settings.model=C.normalizeModelSettings({provider:String(f.get('provider')),model:chosen,contextMessages:Number(f.get('contextMessages')),retryCount:Number(f.get('retryCount')),maxOutputTokens:Number(f.get('maxOutputTokens'))});},'模型接線設定已儲存');};}
 }
 async function selectCharacter(cid){if(await change(d=>{const world=d.worlds.find(x=>x.characterId===cid);d.selected={characterId:cid,worldId:world.id,threadId:d.threads.filter(t=>t.worldId===world.id).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0]?.id||null};})){search='';drawer=false;render();markCurrentThreadRead();}}
@@ -523,15 +1055,73 @@ function markCurrentThreadRead(){
 }
 function resizeInput(){const t=$('#message-input');if(t){t.style.height='auto';t.style.height=Math.min(t.scrollHeight,160)+'px';}}
 function scrollMessages(){requestAnimationFrame(()=>{const e=$('#messages');if(e)e.scrollTop=e.scrollHeight;});}
-function showPending(content){
- const {character}=scope(),model=modelSettings(),provider=providerCatalog().find(p=>p.id===model.provider),column=$('#messages .message-column');
- if(!column)return;
- if(column.querySelector('.welcome'))column.innerHTML='';
- const now=new Date().toISOString();
- column.insertAdjacentHTML('beforeend',`<article class="message user pending-local"><div class="message-inner"><div class="message-meta"><span>${esc(w().settings.playerName||'妳')}</span><time>${date(now)}</time></div><div class="bubble">${esc(content)}</div></div></article><article class="message assistant pending-local pending-reply">${avatar(character,'message-avatar')}<div class="message-inner"><div class="message-meta"><span>${esc(character.name)}</span><time>傳送中</time></div><div class="bubble"><span class="pending-dot"></span>${esc(provider?.label||model.provider)} 正在回覆…</div></div></article>`);
- scrollMessages();
+async function resizeChatImage(file,{transparent=false}={}){
+ if(file.size>15000000)throw Error('請選擇 15 MB 以下的圖片。');
+ const url=URL.createObjectURL(file),image=new Image();
+ try{
+  await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=()=>reject(Error('無法讀取圖片，請試一般 JPEG 或 PNG。'));image.src=url;});
+  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+  for(const size of transparent?[450,330,240]:[960,720,520]){
+   const scale=Math.min(1,size/Math.max(image.naturalWidth,image.naturalHeight));
+   canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
+   canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+   if(!transparent){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}
+   ctx.drawImage(image,0,0,canvas.width,canvas.height);
+   const value=transparent?canvas.toDataURL('image/png'):canvas.toDataURL('image/jpeg',.75);
+   if(C.validImage(value))return value;
+  }
+  throw Error('照片壓縮後仍然太大。');
+ }finally{URL.revokeObjectURL(url);}
 }
-async function send(e){e?.preventDefault();if(busy)return;const input=$('#message-input'),button=$('.send-button');if(!input||!input.value.trim())return;const content=input.value,key=draftKey();sendError='';busy=true;document.body.classList.add('working');showPending(content);input.value='';input.disabled=true;button.type='button';button.disabled=false;button.innerHTML=icon('stop');button.setAttribute('aria-label','停止回覆');button.onclick=()=>service.cancel();try{await service.send(content,{modelOverride:modelSettings(),replyTo:replyDrafts.get(key)});drafts.delete(key);replyDrafts.delete(key);}catch(err){if(err?.code==='cancelled'){sendError='';toast('已停止這次回覆。');}else{sendError=err.message||'模型回覆失敗。';toast(sendError,true);}}finally{busy=false;document.body.classList.remove('working');render();$('#message-input')?.focus();}}
+async function send(event){
+ event.preventDefault();
+ const content=$('#message-input')?.value.trim();
+ if(content)await submitMessage(content);
+}
+async function submitMessage(content,options={}){
+ if(busy)return;
+ retainDraft();
+ const key=draftKey(),button=$('.send-button'),input=$('#message-input');
+ sendError='';busy=true;
+ const status=document.createElement('p');
+ status.className='im-pending';status.setAttribute('role','status');status.textContent=scope().character.name+' 正在輸入…';
+ $('#messages .message-column')?.append(status);
+ scrollMessages();
+ input.disabled=true;
+ for(const control of document.querySelectorAll('.im-tools button'))control.disabled=true;
+ button.type='button';button.innerHTML=icon('stop');button.setAttribute('aria-label','停止回覆');button.onclick=()=>service.cancel();
+ try{
+  await service.send(content,{modelOverride:modelSettings(),replyTo:options.proactive?undefined:replyDrafts.get(key),...options});
+  if(!options.proactive&&!options.kind){drafts.delete(key);replyDrafts.delete(key);}
+  if(options.kind)replyDrafts.delete(key);
+ }catch(error){
+  if(error?.code==='cancelled')toast('已停止回覆。');
+  else sendError=error.message||'模型回覆失敗。';
+ }finally{busy=false;render();}
+}
+function showStickers(){
+ const custom=w().settings.customStickers;
+ modal('貼圖',`<div class="sticker-grid">${C.stickers.map((label,index)=>`<button type="button" data-sticker="${index}" aria-label="傳送貼圖 ${label}">${label}</button>`).join('')}
+ ${custom.map((image,index)=>`<button type="button" data-custom-sticker="${index}" aria-label="傳送自製貼圖 ${index+1}"><img src="${esc(image)}" alt=""></button>`).join('')}</div>
+ <label class="field">加入自製貼圖<input type="file" accept="image/*" id="custom-sticker-file"></label>`,{label:'關閉',cancel:false});
+ for(const button of document.querySelectorAll('[data-sticker],[data-custom-sticker]'))button.onclick=()=>{
+  $('#modal').close();
+  const index=button.dataset.customSticker;
+  submitMessage(index===undefined?C.stickers[button.dataset.sticker]:'傳了一張自製貼圖。',{kind:'sticker',image:custom[index]});
+ };
+ $('#custom-sticker-file').onchange=async event=>{
+  const file=event.target.files[0];if(!file)return;
+  try{
+   const image=await resizeChatImage(file,{transparent:true});
+   if(custom.length>=12)throw Error('自製貼圖最多可存 12 張。');
+   if(await change(d=>{d.settings.customStickers.push(image);},'已加入貼圖。'))showStickers();
+  }catch(error){toast(error.message,true);}
+ };
+}
+function showGifts(){
+ modal('送個禮物',`<label class="field">挑選禮物<select name="gift">${C.gifts.map(gift=>`<option value="${esc(gift)}">${esc(gift)} · 5 點</option>`).join('')}</select></label>`,
+ {label:'送出',submit:form=>{if(LittleLife.points(w())<5)throw Error('虛擬點數不足。');const gift=form.get('gift');queueMicrotask(()=>submitMessage('🎁 '+gift,{kind:'gift'}));}});
+}
 function modal(title,body,{label='儲存',submit,cancel=true,wide=false,danger=false}={}){
  const d=$('#modal');if(d.open)d.close('cancel');d.returnValue='cancel';d.oncancel=()=>{d.returnValue='cancel';};d.className=wide?'wide-dialog':'';d.innerHTML=`<form id="modal-form"><div class="dialog-heading"><h2>${esc(title)}</h2><button type="button" class="icon-btn" id="modal-close" aria-label="關閉">${icon('close')}</button></div><div class="dialog-body">${body}</div><div class="dialog-footer">${cancel?'<button class="button secondary" type="button" id="modal-cancel">取消</button>':''}<button class="button ${danger?'danger-solid':'primary'}" type="submit">${esc(label)}</button></div></form>`;
  const close=()=>d.close('cancel');$('#modal-close').onclick=close;if($('#modal-cancel'))$('#modal-cancel').onclick=close;
@@ -548,12 +1138,26 @@ function exportStamp(){return new Date().toLocaleString('zh-TW');}
 function exportDate(value){return date(value,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false})||String(value||'');}
 function sortedThreads(worldId){return w().threads.filter(t=>t.worldId===worldId).sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt))||String(a.updatedAt).localeCompare(String(b.updatedAt)));}
 function messagesForThread(threadId){return w().messages.filter(m=>m.threadId===threadId).sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt)));}
-function messageBlock(m,character,level='###'){return [level+' '+(m.role==='user'?(w().settings.playerName||'妳'):character.name)+' · '+exportDate(m.createdAt),'',m.content,''].join('\n');}
-function threadMarkdown(thread,character,world,{heading=1,includeMeta=true,includeTitle=true}={}){const prefix='#'.repeat(heading),rows=messagesForThread(thread.id),parts=[];if(includeTitle)parts.push(prefix+' '+thread.title,'');if(includeMeta)parts.push('角色：'+character.name,'世界：'+world.name,'房型：'+roomLabel(thread),'');if(!rows.length)parts.push('（這段對話目前沒有訊息。）','');else for(const m of rows)parts.push(messageBlock(m,character,'#'.repeat(Math.min(6,heading+(includeTitle?1:0)))));return parts.join('\n');}
+function messageBlock(m,character,level='###'){return [level+' '+(m.role==='user'?playerDisplay(w().settings):character.name)+' · '+exportDate(m.createdAt),'',m.content,''].join('\n');}
+function threadMarkdown(thread,character,world,{heading=1,includeMeta=true,includeTitle=true}={}){const prefix='#'.repeat(heading),rows=messagesForThread(thread.id),parts=[];if(includeTitle)parts.push(prefix+' '+thread.title,'');if(includeMeta)parts.push('角色：'+character.name,'世界：'+world.name,'形式：'+roomLabel(thread),'');if(!rows.length)parts.push('（這段對話目前沒有訊息。）','');else for(const m of rows)parts.push(messageBlock(m,character,'#'.repeat(Math.min(6,heading+(includeTitle?1:0)))));return parts.join('\n');}
 function threadChapter(thread,character,world,index,total,heading){const rows=messagesForThread(thread.id),prefix='#'.repeat(heading),created=exportDate(thread.createdAt)||'—',updated=exportDate(thread.updatedAt)||created;return [prefix+' 聊天室 '+(index+1)+' / '+total+'｜'+thread.title,'','> 建立：'+created+'　｜　最近更新：'+updated+'　｜　'+roomLabel(thread)+'　｜　'+rows.length+' 則訊息','',threadMarkdown(thread,character,world,{heading:Math.min(6,heading+1),includeMeta:false,includeTitle:false})].join('\n');}
 function worldMarkdown(character,world){const parts=['# '+character.name+'｜'+world.name,'','角色：'+character.name,'世界：'+world.name,'匯出時間：'+exportStamp(),''];const threads=sortedThreads(world.id);if(!threads.length)parts.push('（這個世界目前沒有對話。）','');else threads.forEach((t,i)=>{if(i)parts.push('','---','','## 下一個聊天室','');parts.push(threadChapter(t,character,world,i,threads.length,2),'');});return parts.join('\n');}
 function characterMarkdown(character){const parts=['# '+character.name+'｜全部劇情','','角色：'+character.name,'匯出時間：'+exportStamp(),''];const worlds=w().worlds.filter(x=>x.characterId===character.id);worlds.forEach((world,wi)=>{if(wi)parts.push('','---','','# 下一個世界','');parts.push('## 世界 '+(wi+1)+' / '+worlds.length+'｜'+world.name,'');const threads=sortedThreads(world.id);if(!threads.length){parts.push('（這個世界目前沒有對話。）','');return;}threads.forEach((t,i)=>{if(i)parts.push('','---','','### 下一個聊天室','');parts.push(threadChapter(t,character,world,i,threads.length,3),'');});});return parts.join('\n');}
 async function action(name){if(busy)return;
+ if(name==='clear-player-avatar'){
+  const form=$('#player-profile-form');
+  const fields={displayName:form.elements.displayName.value,playerName:form.elements.playerName.value};
+  if(await change(d=>{d.settings.playerAvatar='';},'已移除頭像。')){
+   const updated=$('#player-profile-form');
+   if(updated)for(const [name,value] of Object.entries(fields))updated.elements[name].value=value;
+  }
+  return;
+ }
+ if(name==='clear-custom-api'){
+  try{LittleCustom.save('','',false);await change(d=>{if(d.settings.model.provider==='custom')d.settings.model={...d.settings.model,provider:'mock',model:'mock-fixed'};},'自訂 API 已清除。');}
+  catch(error){toast(error.message,true);}
+  return;
+ }
  if(name==='clear-gemini-key'){
   try{MoonlitWeb.saveKey('',false);render();toast('Gemini 金鑰已清除。');}
   catch(error){toast(error.message,true);}
@@ -565,9 +1169,26 @@ async function action(name){if(busy)return;
   return;
  }
  if(name==='open-drawer'||name==='close-drawer'){retainDraft();drawer=name==='open-drawer';render();return;}
- if(name==='new-thread')modal('新增一個房間',inputField('房間名稱','title','新的對話')+`<label class="field">房型<select name="roomType"><option value="room">長聊房 · 沿用模型回覆上限</option><option value="phone">手機房 · 預設 300 tokens</option></select></label><p class="hint">兩種房型共用目前角色、世界與參考資料；只有聊天介面與單次回覆節奏不同。</p>`,{label:'蓋房間',submit:async f=>{const type=String(f.get('roomType'))==='phone'?'phone':'room';if(!await change(d=>{const t={id:C.id(),worldId:world.id,title:String(f.get('title')).trim()||'新的對話',roomType:type,maxOutputTokens:type==='phone'?300:null,createdAt:C.now(),updatedAt:C.now()};d.threads.push(t);d.selected.threadId=t.id;}))throw Error('建立失敗');view='chat';drawer=false;render();$('#message-input')?.focus();}});
+ if(name==='proactive'){await submitMessage('',{proactive:true});return;}
+ if(name==='photo'){$('#chat-photo-file').click();return;}
+ if(['new-post','role-post','role-diary','new-event','new-group','ask-gift'].includes(name)){await lifeAction(name,character,world);return;}
+ if(name==='stickers'){showStickers();return;}
+ if(name==='gifts'){showGifts();return;}
+ if(name==='older-messages'&&thread){
+  const pane=$('#messages'),height=pane.scrollHeight,top=pane.scrollTop;
+  historyCount.set(thread.id,(historyCount.get(thread.id)||120)+120);
+  retainDraft();render();
+  requestAnimationFrame(()=>{const next=$('#messages');next.scrollTop=next.scrollHeight-height+top;});
+  return;
+ }
+ if(name==='new-thread')modal('新增對話',inputField('對話名稱','title','新的對話'),{label:'建立',submit:async f=>{
+  if(!await change(d=>{
+   const t={id:C.id(),worldId:world.id,title:String(f.get('title')).trim()||'新的對話',roomType:'phone',maxOutputTokens:null,createdAt:C.now(),updatedAt:C.now()};
+   d.threads.push(t);d.selected.threadId=t.id;
+  }))throw Error('建立失敗');
+  view='chat';drawer=false;render();
+ }});
  if(name==='rename-thread')modal('重新命名對話',inputField('對話名稱','title',thread.title),{submit:async f=>{if(!await change(d=>{d.threads.find(t=>t.id===thread.id).title=String(f.get('title')).trim();},'名稱已更新'))throw Error('沒有儲存成功，請稍後再試。');}});
- if(name==='room-settings'){const current=roomType(thread),currentTokens=roomTokens(thread);modal('房間設定 · '+thread.title,`<label class="field">房型<select name="roomType"><option value="room" ${current==='room'?'selected':''}>長聊房</option><option value="phone" ${current==='phone'?'selected':''}>手機房</option></select></label><label class="field">這間房的回覆上限<select name="maxOutputTokens"><option value="inherit" ${thread.maxOutputTokens===null?'selected':''}>沿用全域設定（${modelSettings().maxOutputTokens} tokens）</option>${[[80,'一句／很短'],[150,'極短訊息'],[300,'LINE／自然短聊'],[600,'日常聊天'],[1200,'長聊天'],[1800,'標準長文'],[2500,'劇情'],[3000,'長篇劇情'],[4000,'超長']].map(([n,label])=>`<option value="${n}" ${thread.maxOutputTokens===n?'selected':''}>${n} · ${label}</option>`).join('')}</select></label><p class="hint">手機房新建時預設 300；之後可以在這裡自己調。150 仍保留給刻意要極短訊息的房間。切房型不會搬走或刪除原本訊息。</p>`,{submit:async f=>{const type=String(f.get('roomType'))==='phone'?'phone':'room',raw=String(f.get('maxOutputTokens')),cap=raw==='inherit'?null:Number(raw);if(!await change(d=>{const t=d.threads.find(x=>x.id===thread.id);t.roomType=type;t.maxOutputTokens=Number.isInteger(cap)?cap:null;},'房間設定已更新'))throw Error('房間設定沒有存好。');}});}
  if(name==='delete-thread'&&await confirmDialog('刪除這段對話？','「'+esc(thread.title)+'」和其中的訊息將從本機移除。若想保留，請先匯出完整備份。','刪除對話'))await change(d=>{C.deleteThread(d,thread.id);},'對話已刪除');
  if(name==='new-character')modal('新的相遇',inputField('角色名字','name')+inputField('起始世界','world','日常')+'<p class="hint">建立後可以補上人設、頭像與參考資料。新角色不會帶入其他人的聊天記憶。</p>',{label:'建立角色',submit:async f=>{if(!await change(d=>{const cid=C.id(),wid=C.id();d.characters.push({id:cid,name:String(f.get('name')).trim(),description:'',persona:'',avatar:''});d.worlds.push({id:wid,characterId:cid,name:String(f.get('world')).trim(),instructions:'',memory:''});d.selected={characterId:cid,worldId:wid,threadId:null};},'角色已建立'))throw Error('建立失敗');view='profile';search='';drawer=false;render();}});
  if(name==='duplicate-character'){const p=C.characterPackage(w(),character.id,false);p.character.name=(p.character.name+' · 副本').slice(0,60);await change(d=>Object.assign(d,C.addPackage(d,p)),'已複製設定；沒有帶入聊天或世界記憶');}
@@ -603,8 +1224,9 @@ async function uploadReference(e){
  }catch(err){toast(err.message||'讀取失敗，這批尚未加入。',true);}
  finally{busy=false;document.body.classList.remove('working');render();}
 }
-async function init(){try{repo=await ChatStorage.open();let data=await repo.load();if(!data){data=C.seed();await repo.save(data);}else{data=C.validate(data);}service=new C.WorkspaceService(repo,data);render();}catch(e){$('#app').innerHTML=`<main class="fatal"><span class="brand-icon">${icon('moon')}</span><h1>本機資料暫時無法開啟</h1><p>${esc(e.message)}</p><p>請確認 Safari 允許網站儲存，再重新整理。</p><button class="button primary" onclick="location.reload()">重新整理</button></main>`;}}
+async function init(){try{repo=await ChatStorage.open();let data=await repo.load();if(!data){data=C.seed();await repo.save(data);}else{data=C.validate(data);}service=new C.WorkspaceService(repo,data);render();setTimeout(runDailyLife,0);}catch(e){$('#app').innerHTML=`<main class="fatal"><span class="brand-icon">${icon('moon')}</span><h1>本機資料暫時無法開啟</h1><p>${esc(e.message)}</p><p>請確認 Safari 允許網站儲存，再重新整理。</p><button class="button primary" onclick="location.reload()">重新整理</button></main>`;}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer){drawer=false;render();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)runDailyLife();});
 init();
 })();
 </script></body></html>
