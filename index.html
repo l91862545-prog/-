@@ -249,6 +249,9 @@ input[type=date]::-webkit-date-and-time-value{min-width:0;text-align:left}
 
 .sticker-grid button{background:var(--panel);border-color:var(--line)}.sticker-grid button[data-built-in] img{height:70px}.im-sticker .chat-media{max-width:140px;max-height:140px}
 
+/* v0.2.6 life metric cards */
+.metric-heading,.metric-main,.metric-history-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.metric-heading{justify-content:space-between}.metric-heading h3{margin:0}.metric-heading time,.metric-history-row time,.metric-main span,.metric-main small,.trend-dates{color:var(--muted);font-size:.85em}.metric-main{margin:12px 0 8px}.metric-main strong{font-size:32px;color:var(--green-dark);font-variant-numeric:tabular-nums;line-height:1.2}.metric-main small{margin-left:auto}.water-track{height:9px;border-radius:999px;background:var(--sage);overflow:hidden}.water-track span{display:block;height:100%;border-radius:999px;background:#91aa8d}.metric-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}.metric-actions .button{font-size:13px;min-height:36px;padding:6px 12px}.metric-history{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.metric-history summary{cursor:pointer;color:var(--green)}.metric-history-row{padding:10px 0;border-bottom:1px solid var(--line)}.metric-history-row .metric-actions{margin:0 0 0 auto}.metric-trend{color:var(--green);margin-top:8px}.metric-trend svg{display:block;width:100%;max-height:100px}.trend-dates{display:flex;justify-content:space-between;gap:4px;font-size:11px}
+
 @media(max-width:760px){.topbar,.chat-mode .topbar{height:calc(50px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}.chat-mode .composer-wrap{padding-bottom:max(12px,env(safe-area-inset-bottom))}}</style></head>
 <body><div id="app"><div class="boot">正在開啟小倉庫…</div></div><dialog id="modal" aria-label="操作視窗"></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>(function(root){
@@ -615,7 +618,17 @@ function points(workspace){return workspace.life.wallet.reduce((value,row)=>valu
 function isDemo(row){return row.mock===true||/^（示範）/.test(String(row.text));}
 function cleanText(text){return String(text||'').replace(/\|\|/g,'\n').replace(/^\s*(?:✨\s*)?\d{1,2}:\d{2}\s*\|\s*@[^\n]+\n?/gm,'').replace(/^\s*\(?@[\w.-]+\)?\s*$/gm,'').replace(/\n{3,}/g,'\n\n').trim();}
 function summary(w,world){if(world.lifeAccess!==true)return '';const today=localDate(),y=new Date();y.setDate(y.getDate()-1);const yesterday=localDate(y);const rows=w.life?.records||[];const lines=[];for(const date of [today,yesterday]){for(const metric of ['water','sleep']){const row=rows.find(r=>r.date===date&&r.metric===metric);if(row&&Number.isFinite(Number(row.value)))lines.push(date+' '+metrics[metric][0]+' '+row.value+' '+metrics[metric][1]);}}if(rows.some(r=>r.date===today&&r.metric==='period'&&Number(r.value)>0)){let days=1,d=new Date();for(let i=0;i<30;i++){d.setDate(d.getDate()-1);if(!rows.some(r=>r.date===localDate(d)&&r.metric==='period'&&Number(r.value)>0))break;days++;}lines.push('今天有經期標記，連續標記第 '+days+' 天。');}if(lines.some(x=>x.includes('喝水')))lines.push('自訂每日飲水目標 '+(w.life.waterGoal||2000)+' mL。');return lines.join('\n');}
-root.LittleLife={normalize,localDate,metrics,points,isDemo,cleanText,summary};
+function trend(rows,today){
+ const end=new Date(today+'T12:00:00');if(!Number.isFinite(end.getTime()))return '';
+ const dates=Array.from({length:7},(_,i)=>{const d=new Date(end);d.setDate(d.getDate()-6+i);return localDate(d);});
+ const points=dates.map((date,i)=>{const row=rows.find(r=>r.date===date);return row&&row.value!==null&&row.value!==''&&Number.isFinite(Number(row.value))?{i,value:Number(row.value)}:null;}).filter(Boolean);
+ if(points.length<2)return '<p class="hint">近七日累積至少兩筆紀錄後顯示趨勢</p>';
+ const lo=Math.min(...points.map(p=>p.value)),hi=Math.max(...points.map(p=>p.value)),span=hi-lo;
+ const xy=points.map(p=>[12+p.i*46,span?68-(p.value-lo)/span*54:41]);
+ const segments=xy.slice(1).map((p,i)=>`<line x1="${xy[i][0]}" y1="${xy[i][1]}" x2="${p[0]}" y2="${p[1]}" ${points[i+1].i-points[i].i>1?'stroke-dasharray="3 5"':''}/>`).join('');
+ return `<div class="metric-trend"><svg viewBox="0 0 300 80" role="img" aria-label="近七日紀錄趨勢，最低 ${lo}，最高 ${hi}" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">${segments}</g>${xy.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="currentColor"/>`).join('')}</svg><div class="trend-dates"><span>${dates[0].slice(5).replace('-','/')}</span><span>近七日 · 虛線為缺少紀錄</span><span>${dates[6].slice(5).replace('-','/')}</span></div></div>`;
+}
+root.LittleLife={trend,normalize,localDate,metrics,points,isDemo,cleanText,summary};
 })(globalThis);
 
 (function () {
@@ -664,7 +677,7 @@ function render(){
  <div class="thread-heading"><span>這個世界的對話</span><button class="icon-btn" data-action="new-thread" aria-label="新增對話" title="新增對話">${icon('plus')}</button></div>
  <label class="search-box">${icon('search')}<input id="thread-search" placeholder="找一段對話" value="${esc(search)}" aria-label="搜尋目前世界的對話"></label>
  <div class="thread-list">${threads.map(t=>`<button class="thread ${t.id===thread?.id?'selected':''}" data-thread="${t.id}"><span>${icon('chat')}</span><div>${esc(t.title)}<small>${roomLabel(t)} · ${date(t.updatedAt,{month:'short',day:'numeric'})}${unread.has(t.id)?' · 未讀':''}</small></div></button>`).join('')||'<div class="list-empty">還沒有對話，<br>從一句話開始就好。</div>'}</div></div>
- <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.5</span></div></div></aside>
+ <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.6</span></div></div></aside>
  <main class="main ${view==='chat'?'chat-mode messenger':''}"><header class="topbar"><button class="icon-btn mobile-only" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button><div class="breadcrumb"><span>${esc(character.name)}</span><span class="slash">/</span><select id="world-select" aria-label="切換世界">${w().worlds.filter(x=>x.characterId===character.id).map(x=>`<option value="${x.id}" ${x.id===world.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div><span class="provider-pill"><i></i>${esc(provider?.label||model.provider)}<span class="wide-text"> · ${esc(model.model)}</span></span><button class="icon-btn context-button" data-action="context" aria-label="查看本次上下文" title="查看本次上下文">${icon('file')}</button></header>
  ${view==='chat'?chatPage(character,world,thread):view==='profile'?profilePage(character,world):['feed','records'].includes(view)?lifePage(view,character,world):settingsPage()}
  </main>`;
@@ -741,9 +754,13 @@ function lifePage(route,character,world){
  if(route==='records'){
   const dateValue=LittleLife.localDate();
   const chart=Object.entries(LittleLife.metrics).map(([id,[label,unit]])=>{
-   const rows=life.records.filter(row=>row.metric===id).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,7);
-   const max=id==='water'?Math.max(1,life.waterGoal||2000):Math.max(1,...rows.map(row=>Number(row.value)||0));
-   return `<section class="life-card"><h3>${label}</h3>${rows.map(row=>`<div class="trend-row"><time>${esc(row.date)}</time><meter min="0" max="${max}" value="${Math.min(max,Math.max(0,Number(row.value)||0))}"></meter><span>${esc(row.value)+esc(unit)}</span></div>`).join('')||'<p>還沒有紀錄</p>'}</section>`;
+   const rows=life.records.filter(row=>row.metric===id).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+   const latest=rows[0],goal=Math.max(1,Number(life.waterGoal)||2000);
+   const percent=latest?Math.round(Number(latest.value)/goal*100):0;
+   const action=row=>`<div class="metric-actions"><button type="button" class="button secondary" data-record-edit="${id}:${esc(row.date)}">編輯</button><button type="button" class="button secondary" data-record-delete="${id}:${esc(row.date)}">刪除</button></div>`;
+   const history=rows.slice(1);
+   const trend=id==='water'?'':LittleLife.trend(rows,dateValue);
+   return `<section class="life-card metric-card"><div class="metric-heading"><h3><span aria-hidden="true">${({water:'💧',sleep:'☾',weight:'⚖'})[id]}</span> ${label}</h3>${latest?`<time>${esc(latest.date)}</time>`:''}</div>${latest?`<div class="metric-main"><strong>${esc(latest.value)}</strong><span>${id==='water'?'/ '+esc(goal)+' mL':unit}</span>${id==='water'?`<small>${percent}%</small>`:''}</div>${id==='water'?`<div class="water-track" role="progressbar" aria-label="飲水目標" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${Math.min(goal,Math.max(0,Number(latest.value)||0))}"><span style="width:${Math.min(100,Math.max(0,percent))}%"></span></div>`:trend}${action(latest)}${history.length?`<details class="metric-history"><summary>歷史紀錄（${history.length} 筆）</summary>${history.map(row=>`<div class="metric-history-row"><time>${esc(row.date)}</time><strong>${esc(row.value)} ${unit}</strong>${action(row)}</div>`).join('')}</details>`:''}`:'<p class="hint">還沒有紀錄</p>'}</section>`;
   }).join('');
   return `<section class="page-scroll life-page"><h1>我的紀錄</h1>${periodCalendar(life.records)}<form id="water-goal-form" class="life-card"><label class="field">每日飲水目標（mL）<input type="number" name="goal" inputmode="numeric" min="100" max="20000" value="${life.waterGoal||2000}" required></label><button class="button secondary">儲存目標</button></form><form id="record-form" class="life-card">
   <label class="field">日期<input name="date" type="date" value="${dateValue}" required></label>
@@ -820,6 +837,13 @@ function bindLife(){
  for(const button of document.querySelectorAll('[data-group-manage]')){
   button.onclick=()=>manageGroup(button.dataset.groupManage);
  }
+ for(const button of document.querySelectorAll('[data-record-edit],[data-record-delete]'))button.onclick=()=>{
+  const [metric,date]= (button.dataset.recordEdit||button.dataset.recordDelete).split(':');
+  const row=w().life.records.find(r=>r.metric===metric&&r.date===date),meta=LittleLife.metrics[metric];if(!row||!meta)return;
+  const [label,unit,min,max]=meta;
+  if(button.dataset.recordDelete)modal('刪除'+label+'紀錄',`<p>確定刪除 ${esc(date)} 的紀錄？</p>`,{label:'刪除',danger:true,submit:async()=>{if(!await change(d=>{d.life.records=d.life.records.filter(r=>!(r.metric===metric&&r.date===date));},'紀錄已刪除。'))throw Error('刪除失敗。');}});
+  else modal('編輯'+label+'紀錄',`<p>${esc(date)}</p><label class="field">${label}（${unit}）<input name="value" type="number" inputmode="decimal" min="${min}" max="${max}" step="any" value="${esc(row.value)}" required></label>`,{submit:async f=>{const raw=f.get('value'),value=Number(raw);if(raw===''||!Number.isFinite(value)||value<min||value>max)throw Error('請輸入有效數值。');if(!await change(d=>{const current=d.life.records.find(r=>r.metric===metric&&r.date===date);if(!current)throw Error('紀錄不存在。');current.value=value;},'紀錄已更新。'))throw Error('儲存失敗。');}});
+ };
  const record=$('#record-form');
  if(record){
   const metric=record.elements.metric,value=record.elements.value;
