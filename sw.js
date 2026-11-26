@@ -1,6 +1,6 @@
 const appRoot = new URL(self.registration.scope);
 const cachePrefix = 'little-storage:'+appRoot.pathname+':';
-const cacheName = cachePrefix+'e0702f7fccf1';
+const cacheName = cachePrefix+'b1c57a36978c';
 const entry = new URL('index.html', appRoot);
 self.addEventListener('install', event => event.waitUntil((async () => {
  const response = await fetch(entry, {cache:'reload'});
