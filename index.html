@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light"><meta name="theme-color" content="#eeefe7">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小倉庫">
+<meta name="little-storage-web-app" content="1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; manifest-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./moon-192.png">
+<title>小倉庫</title><style>:root{--paper:#f6f5ef;--panel:#eeefe7;--ink:#35443b;--muted:#7d887c;--line:#dfe3d8;--green:#536b53;--green-dark:#3f5842;--sage:#e1e7d9;--gold:#a28e6b;--message-size:16px;font-family:"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,textarea,select{font:inherit;color:inherit}button,a,label.upload-label{ -webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #7e9774;outline-offset:3px}button{border:0;background:none}svg{width:21px;height:21px;flex:none}button svg{pointer-events:none}input,select,textarea{border:1px solid var(--line);border-radius:10px;background:#fcfcf7;min-width:0}input,select{padding:11px 12px}textarea{padding:12px;resize:vertical;line-height:1.8}select{cursor:pointer}button{touch-action:manipulation}h1,h2,p{margin-top:0}h1,h2{font-weight:500}h1{font-family:"Noto Serif TC","Songti TC",Georgia,serif;font-size:30px;letter-spacing:1px}h2{font-size:18px}p{line-height:1.85}small{font-size:11px}.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.mobile-only{display:none!important}
+#app{display:flex;height:100vh;height:100dvh;overflow:hidden}.sidebar{width:280px;flex:0 0 280px;background:var(--panel);border-right:1px solid var(--line);padding:30px 22px 18px;display:flex;flex-direction:column;z-index:20}.brand{display:flex;align-items:center;gap:12px;font-family:"Songti TC",Georgia,serif;font-size:19px;letter-spacing:2px}.brand small{display:block;font:8px/2.6 system-ui,sans-serif;letter-spacing:1.6px;color:var(--muted)}.brand-icon{display:grid;place-items:center;background:var(--green);color:#f7f4de;border-radius:50%;width:37px;height:37px;flex:none}.brand-icon svg{width:21px;height:21px}.character-switch{margin:33px 0 22px}.character-switch>label{display:block;color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:12px}.select-with-avatar{display:flex;align-items:center;gap:8px}.avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:50% 24%;background:#d6ddce;flex:none}.initials{display:inline-grid;place-items:center;font-family:serif;font-size:22px;color:var(--green)}.select-with-avatar select{width:100%;border:0;background:none;padding:10px 2px;font-weight:600;max-width:160px}.icon-btn{width:34px;height:34px;flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;color:var(--muted)}.icon-btn:hover{background:#dde3d5;color:var(--green-dark)}nav{display:grid;gap:4px}.nav-item{display:flex;align-items:center;text-align:left;width:100%;gap:12px;padding:12px 15px;border-radius:10px;font-size:13px;color:var(--muted)}.nav-item.active{background:#dfe5d6;color:var(--green-dark)}.nav-item:hover{background:#e3e7dc}.nav-item svg{width:19px;height:19px}.nav-dot{width:5px;height:5px;background:var(--green);border-radius:50%;margin-left:auto}.reserved small{margin-left:auto;font-size:9px;border:1px solid #d5dbce;padding:1px 5px;border-radius:5px;letter-spacing:1px}.thread-heading{display:flex;align-items:center;justify-content:space-between;margin-top:25px;font-size:10px;letter-spacing:.7px;color:var(--muted)}.search-box{display:flex;align-items:center;border-bottom:1px solid var(--line);gap:8px;margin:1px 5px 13px}.search-box svg{width:14px;height:14px;color:#9aa390}.search-box input{border:0;background:none;width:100%;padding:10px 0;font-size:11px;outline-offset:0}.search-box input::placeholder{color:#98a08f}.thread-list{overflow-y:auto;flex:1;min-height:40px}.thread{display:flex;gap:10px;width:100%;text-align:left;padding:12px 11px;border-radius:9px;margin-bottom:3px;font-size:12px;align-items:flex-start}.thread.selected{background:#f9f9f2;box-shadow:0 2px 5px #31432d05}.thread>span{color:#a1ab97}.thread svg{width:16px;height:16px;margin-top:2px}.thread>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.thread small{display:block;margin-top:5px;color:#98a08f;font-size:9px}.thread:hover{background:#f5f6ef}.list-empty{font-size:12px;color:var(--muted);padding:20px 14px;line-height:1.9}.sidebar-bottom{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}.local-status{font-size:9px;color:#8b9583;margin:18px 14px 0;display:flex;align-items:center;gap:6px}.local-status i,.provider-pill i{width:5px;height:5px;display:inline-block;border-radius:50%;background:#899879}.local-status span{margin-left:auto;font-size:9px}.main{flex:1;min-width:0;display:flex;flex-direction:column}.topbar{height:54px;flex:none;border-bottom:1px solid var(--line);display:flex;gap:9px;align-items:center;padding:0 24px;background:#f7f7f1}.breadcrumb{display:flex;align-items:center;gap:15px;font-size:13px}.slash{color:#b8bfaf}.breadcrumb select{border:0;background:none;color:var(--muted);font-size:12px;padding:8px 15px 8px 0;max-width:210px}.provider-pill{margin-left:auto;font-size:10px;letter-spacing:.2px;color:#7d886f;padding:7px 11px;background:#ecefe3;border:1px solid #e2e7d9;border-radius:20px;white-space:nowrap}.provider-pill i{margin-right:6px}.context-button{margin-left:6px}.chat-view{display:flex;flex-direction:column;flex:1;min-height:0}.conversation-heading{display:flex;align-items:center;justify-content:space-between;padding:28px 42px 20px;flex:none}.eyebrow{color:var(--gold);font-size:9px;letter-spacing:2px;font-weight:500}.conversation-heading h1{font:500 20px/1.5 "Songti TC",Georgia,serif;letter-spacing:1px;margin:8px 0 0;max-width:660px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.heading-actions{display:flex;gap:3px}.messages{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:15px 42px 30px;scrollbar-width:thin;scrollbar-color:#d8ddcf transparent}.message-column{max-width:800px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}.welcome{margin:auto;text-align:center;padding:20px 0 35px;width:100%}.welcome-portrait{position:relative;width:96px;margin:0 auto 30px}.welcome-portrait .avatar{width:96px;height:96px;border:5px solid #e8ebde;box-shadow:0 0 0 1px #d5ddca,0 10px 35px #5f755312}.welcome-portrait>span{position:absolute;bottom:2px;right:-6px;display:grid;place-items:center;background:var(--paper);border-radius:50%;width:30px;height:30px;border:1px solid #d5ddca;color:#9a8c69}.welcome-portrait svg{width:14px;height:14px}.welcome .eyebrow{font-size:8px;letter-spacing:2.5px}.welcome h2{font-family:"Songti TC",Georgia,serif;font-size:32px;letter-spacing:3px;margin:18px 0 14px;font-weight:500}.welcome>p{font-size:13px;color:var(--muted);letter-spacing:1px;margin:0 0 23px}.welcome-note{display:flex;justify-content:center;gap:7px;color:#939b88;font-size:10px;line-height:1.9}.welcome-note svg{width:13px;height:13px;margin-top:3px}.prompt-chips{display:flex;justify-content:center;gap:10px;margin-top:27px}.prompt-chips button{display:flex;align-items:center;gap:18px;border:1px solid #dfe4d6;padding:10px 15px;border-radius:8px;background:#f9faf3;font-size:11px;color:#7a886e}.prompt-chips button:hover{background:#e7eddc}.prompt-chips svg{width:12px;height:12px}.composer-wrap{padding:12px 42px 20px;flex:none;background:linear-gradient(transparent,var(--paper) 25%)}.composer{max-width:800px;margin:0 auto;padding:15px 18px 10px;border:1px solid #d4dccb;border-radius:15px;background:#fcfcf7;box-shadow:0 5px 20px #35412b04}.composer:focus-within{border-color:#a5b297;box-shadow:0 0 0 2px #a6b59413}.composer textarea{width:100%;border:0;background:transparent;border-radius:0;resize:none;min-height:35px;max-height:160px;outline:none;padding:0;font-size:var(--message-size);line-height:1.7}.composer textarea::placeholder{font-size:13px;color:#a1a894;letter-spacing:.5px}.composer-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:7px;gap:5px}.composer-bottom>span{font-size:9px;color:#a0a894;display:flex;align-items:center;gap:5px}.composer-bottom svg{width:12px;height:12px}.send-button{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--green);color:#fafbf4}.send-button svg{width:17px;height:17px;transform:translate(-1px,1px)}.send-button:hover{background:var(--green-dark)}.composer-caption{text-align:center;font-size:8px;letter-spacing:1px;color:#99a28d;margin:10px 0 0}.composer-caption span{margin-left:14px;color:#afb5a7}.date-divider{display:flex;align-items:center;gap:15px;margin:5px 0 25px;font-size:10px;color:#a2ab95}.date-divider:before,.date-divider:after{content:'';height:1px;background:var(--line);flex:1}.message{display:flex;gap:12px;max-width:90%;margin:0 0 25px;align-items:flex-start}.message-avatar{width:32px;height:32px;margin-top:3px}.message-inner{min-width:0}.message-meta{display:flex;align-items:center;gap:10px;font-size:10px;color:#8c9882;margin-bottom:7px}.message-meta time{font-size:9px;color:#a9b29f}.mock-label{font-size:8px;line-height:1.6;background:#e7ecdf;border:1px solid #dce4d0;border-radius:4px;padding:1px 5px}.bubble{white-space:pre-wrap;overflow-wrap:anywhere;font-size:var(--message-size);line-height:1.9;background:#fdfdf7;border:1px solid #e3e7db;padding:15px 20px;border-radius:2px 15px 15px 15px;box-shadow:0 2px 4px #35412b03}.message.user{align-self:flex-end}.user .message-meta{justify-content:flex-end}.user .bubble{background:#e4eadb;border-color:#dce4d1;border-radius:15px 2px 15px 15px;color:#41513c}.page-scroll{overflow-y:auto;flex:1;min-height:0}.page-content{max-width:1100px;margin:0 auto;padding:30px 42px 60px}.page-content>h1{font-size:27px;letter-spacing:1px;margin:14px 0}.page-intro{font-size:12px;color:var(--muted);margin-bottom:30px}.profile-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:22px}.card{padding:25px;background:#fcfcf7;border:1px solid var(--line);border-radius:14px;margin-bottom:22px}.card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}.card-heading h2{font-size:16px;margin:0;letter-spacing:.8px}.tag{font-size:9px;color:#8b977e;background:#edf0e5;border:1px solid #e1e6d8;padding:4px 7px;border-radius:5px}.field{font-size:12px;display:flex;flex-direction:column;gap:9px;margin-bottom:21px}.field input,.field textarea,.field select{width:100%;font-size:13px}.field small,.hint{font-size:10px;line-height:1.9;color:#96a087}.field textarea{line-height:1.9}.avatar-editor{display:flex;align-items:center;gap:18px;margin:5px 0 28px}.avatar.large{width:70px;height:70px;font-size:30px}.avatar-editor small{display:block;font-size:9px;color:#9aa38f;margin-top:7px}.button{display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:10px 15px;border-radius:8px;font-size:12px;line-height:1.6;text-align:center;border:1px solid transparent;white-space:normal}.button svg{width:15px;height:15px}.primary{background:var(--green);color:#fff}.primary:hover{background:var(--green-dark)}.secondary{border-color:#dbe2d1;background:#f6f8ef;color:#6a7f5b}.secondary:hover{background:#e9eddf}.button.full{width:100%}.text-button{display:inline-flex;align-items:center;gap:6px;color:#768d66;font-size:10px;padding:0}.text-button svg{width:13px;height:13px}.danger{color:#a17c70}.card-footer{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:18px;margin-top:23px}.world-list{display:grid;gap:5px;margin-bottom:17px}.world-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:9px;border:1px solid transparent}.world-item.active{background:#edf1e4;border-color:#e0e7d5}.world-symbol{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:#e3e9d9;color:#81956f}.world-symbol svg{width:16px;height:16px}.world-item>div{font-size:12px;flex:1;min-width:0;overflow-wrap:anywhere}.world-item small{display:block;color:#9aa58c;font-size:9px;margin-top:4px}.world-item>svg{width:15px;height:15px;color:#8ba179}.reference-card p,.card>p{font-size:11px;color:#8d9881;line-height:1.9}.reference-list{margin-bottom:20px}.reference-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e8ebdf}.reference-item>svg{width:16px;height:16px;color:#8fa37c}.reference-name{flex:1;text-align:left;font-size:11px;overflow-wrap:anywhere;min-width:0;padding:0}.reference-name small{display:block;color:#a0ac91;margin-top:4px;font-size:9px}.soft-empty{padding:24px;text-align:center;color:#a6af9a;background:#f4f6ec;border-radius:9px;font-size:11px}.upload-label{cursor:pointer}.hint{display:block;margin-top:10px}.settings-content{max-width:950px}.settings-form{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:0 20px}.settings-form .button{justify-self:start}.provider-row{display:flex;align-items:center;gap:14px;padding:0 0 10px}.provider-symbol{width:42px;height:42px;display:grid;place-items:center;color:var(--green);border-radius:10px;background:#e6ecdd}.provider-row strong{font-size:13px;font-weight:500}.provider-row p{font-size:10px;color:#9aa58c;margin:6px 0 0}.connected{margin-left:auto;font-size:9px;color:#8b9b7a;white-space:nowrap}.button-row{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 10px}.notice{background:#f0f2e8;border:1px solid #e6eadd;padding:12px 15px;border-radius:8px;font-size:10px;line-height:1.9;color:#8b967c;margin-top:18px}.checkbox{display:flex;align-items:center;gap:9px;font-size:11px;color:#81916f;margin-top:18px;line-height:1.7}.checkbox input{accent-color:var(--green);width:15px;height:15px;flex:none}.storage-footer{display:flex;gap:13px;padding:4px;color:#9aa58d}.storage-footer svg{width:18px;height:18px}.storage-footer strong{font-size:11px;font-weight:500}.storage-footer span{display:block;font-size:9px;line-height:1.9;margin-top:7px}.storage-footer .version{margin-left:auto;align-self:center}.drawer-backdrop{display:none}.working .send-button{opacity:.5}.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,15px);max-width:min(540px,90vw);padding:13px 22px;background:#465d47;color:#fff;border-radius:11px;font-size:12px;line-height:1.7;opacity:0;pointer-events:none;transition:.2s;z-index:100;box-shadow:0 5px 25px #33452e20;overflow-wrap:anywhere}.toast.visible{opacity:1;transform:translate(-50%,0)}.toast.error{background:#8d6559}dialog{border:1px solid #d7dfcd;border-radius:17px;padding:0;max-width:min(560px,calc(100vw - 32px));width:560px;max-height:85vh;color:var(--ink);background:var(--paper);box-shadow:0 20px 100px #23391b25}dialog::backdrop{background:#25321d70;backdrop-filter:blur(3px)}dialog.wide-dialog{width:780px;max-width:calc(100vw - 32px)}#modal-form{display:flex;flex-direction:column;max-height:85vh}.dialog-heading{display:flex;justify-content:space-between;align-items:center;padding:22px 25px 12px;border-bottom:1px solid var(--line);gap:10px}.dialog-heading h2{font-size:17px;margin:0;overflow-wrap:anywhere}.dialog-body{padding:24px 25px;overflow-y:auto}.dialog-body>p{font-size:13px;line-height:1.9;margin-bottom:0}.dialog-body .notice{margin-top:0;margin-bottom:18px}.dialog-footer{padding:15px 25px 20px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line)}.danger-solid{background:#9b7466;color:#fff}.context-text{font:12px/1.9 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;background:#edefe3;padding:18px;border-radius:10px;margin:0}.fatal{max-width:650px;margin:auto;padding:50px}.fatal h1{margin-top:25px}.fatal p{font-size:13px;color:var(--muted)}.boot{display:grid;place-items:center;width:100%;text-align:center;color:var(--muted);font-size:13px;letter-spacing:2px}
+@media(min-width:1600px){.sidebar{width:300px;flex-basis:300px;padding-left:30px;padding-right:30px}.welcome h2{font-size:38px}.welcome-portrait{width:110px}.welcome-portrait .avatar{width:110px;height:110px}}
+@media(max-width:1100px){.sidebar{width:245px;flex-basis:245px;padding:25px 15px 18px}.topbar{padding:0 24px}.conversation-heading{padding:24px 28px 18px}.messages{padding:10px 28px 25px}.composer-wrap{padding:12px 28px 20px}.profile-grid{grid-template-columns:1fr}.page-content{padding:28px 28px 50px}.card{padding:22px}.brand{font-size:17px;letter-spacing:1px}.brand small{font-size:7px;letter-spacing:1px}}
+@media(max-width:760px){.mobile-only{display:inline-flex!important}.sidebar{position:fixed;top:0;bottom:0;left:0;transform:translateX(-100%);width:280px;padding-top:max(25px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom));transition:transform .2s}.sidebar.open{transform:translateX(0)}.brand .mobile-only{margin-left:auto}.drawer-backdrop.visible{display:block;position:fixed;inset:0;z-index:19;background:#23331e65;backdrop-filter:blur(2px)}.topbar{height:50px;padding:0 10px;gap:7px}.breadcrumb{gap:10px;font-size:13px;min-width:0}.breadcrumb>span:first-child{max-width:70px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}.breadcrumb select{max-width:105px;font-size:11px;padding-right:1px}.provider-pill{font-size:9px;padding:6px 8px}.provider-pill .wide-text{display:none}.context-button{margin-left:0}.conversation-heading{padding:23px 20px 13px}.conversation-heading h1{font-size:18px;max-width:calc(100vw - 130px)}.eyebrow{font-size:8px;letter-spacing:1.5px}.heading-actions .icon-btn{width:29px}.heading-actions svg{width:17px;height:17px}.messages{padding:10px 17px 20px}.welcome{padding:15px 0 25px}.welcome-portrait{width:86px;margin-bottom:26px}.welcome-portrait .avatar{width:86px;height:86px}.welcome h2{font-size:27px;letter-spacing:2px;margin:17px 0 12px}.welcome>p{font-size:11px}.welcome-note{font-size:9px}.welcome .eyebrow{font-size:7px;letter-spacing:2px}.prompt-chips{gap:8px;margin-top:23px}.prompt-chips button{padding:9px 12px;font-size:10px;gap:12px}.composer-wrap{padding:8px 13px max(12px,env(safe-area-inset-bottom))}.composer{border-radius:13px;padding:13px 13px 9px}.composer textarea{font-size:max(16px,var(--message-size))}.composer-caption{font-size:7px;letter-spacing:.5px;margin-top:8px}.composer-caption span{margin-left:8px}.composer-bottom>span{font-size:8px}.desktop-hint{display:none}.message{max-width:94%;gap:8px;margin-bottom:21px}.message-avatar{width:27px;height:27px}.bubble{padding:12px 15px;font-size:var(--message-size);line-height:1.9}.message-meta{font-size:9px;gap:8px}.mock-label{font-size:7px}.date-divider{font-size:9px}.page-content{padding:24px 19px 35px}.page-content>h1{font-size:23px;line-height:1.6}.page-intro{font-size:11px;margin-bottom:24px}.card{padding:20px;margin-bottom:17px}.settings-form{grid-template-columns:1fr}.field input,.field textarea,.field select{font-size:16px}.card-heading{gap:8px}.button-row{gap:8px}.button{font-size:11px}.dialog-body{padding:20px}.dialog-heading{padding:15px 20px 12px}.dialog-footer{padding:14px 20px}.toast{bottom:20px;font-size:11px;max-width:calc(100vw - 30px);width:max-content}input,textarea{scroll-margin:20px}}
+@media(max-height:750px){.welcome-portrait{margin-bottom:18px;width:70px}.welcome-portrait .avatar{width:70px;height:70px}.welcome{padding:10px 0 20px}.welcome h2{font-size:26px;margin-top:13px}.welcome>p{margin-bottom:13px}.prompt-chips{margin-top:16px}.conversation-heading{padding-top:17px;padding-bottom:10px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+/* One scroll area for the sidebar; settings never share the history's viewport. */
+.sidebar{min-height:0;overflow:hidden}
+.sidebar>.brand,.sidebar-bottom{flex:none}
+.sidebar-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#9da991 transparent;padding-right:6px;margin-right:-6px}
+.sidebar-scroll:focus-visible{outline-offset:-2px;border-radius:6px}
+.thread-list{flex:none;min-height:0;overflow:visible;padding-bottom:8px}
+.sidebar-bottom{margin-top:12px;background:var(--panel);position:relative}
+@media(max-height:650px){.sidebar{padding-top:18px;padding-bottom:12px}.character-switch{margin-top:20px;margin-bottom:16px}.thread-heading{margin-top:18px}.sidebar-bottom{margin-top:8px;padding-top:8px}.local-status{margin-top:10px}}
+@media(max-width:760px) and (max-height:650px){.sidebar{padding-top:max(18px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}}
+#story-stage{position:fixed;left:280px;right:0;top:48px;bottom:0;display:none;flex-direction:column;z-index:2;background:var(--paper)}
+body.story-open #story-stage{display:flex}
+body.story-open .topbar{height:48px;padding-top:0;padding-bottom:0}
+.museum-bar{min-height:42px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:6px 25px;border-bottom:1px solid var(--line);background:#eef0e7}
+.museum-bar strong{font:500 14px/1.6 "Songti TC",Georgia,serif;letter-spacing:1px}
+.museum-bar div>span{font-size:9px;color:var(--muted);margin-left:15px}
+#story-save-status{font-size:10px;color:#6f8660;white-space:nowrap}
+#story-save-status[data-state="error"]{color:#a06450}
+#story-frame-mount{flex:1;min-height:0;display:flex}
+#story-frame{width:100%;height:100%;border:0;flex:1;min-height:0;background:#f4f2ed}
+.museum-placeholder{flex:1;min-height:0}
+@media(min-width:1600px){#story-stage{left:300px}}
+@media(max-width:1100px){#story-stage{left:245px}}
+@media(max-width:760px){body.story-open .topbar{height:42px;padding-top:0;padding-bottom:0}#story-stage{left:0;top:42px}.museum-bar{padding:5px 12px;min-height:36px}.museum-bar div>span{display:none}.museum-bar strong{font-size:13px}#story-save-status{font-size:9px}}
+\n/* v0.2.5 API send feedback */\n.pending-local{opacity:.82}.pending-reply .bubble{display:flex;align-items:center;gap:9px}.pending-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.65;animation:moonlitPulse 1s ease-in-out infinite}.send-error{max-width:780px;margin:0 auto 10px;padding:11px 14px;border:1px solid rgba(150,70,70,.28);border-radius:12px;background:rgba(150,70,70,.08);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:13px}.send-error strong{font-weight:650}.send-error span{opacity:.85}@keyframes moonlitPulse{0%,100%{transform:scale(.75);opacity:.35}50%{transform:scale(1.15);opacity:.9}}\n
+
+/* v0.2.7 simple room types */
+.room-badge{display:inline-flex;margin-top:8px;padding:4px 8px;border:1px solid #dde3d5;border-radius:999px;background:#f1f3ea;color:#87927e;font-size:9px;letter-spacing:.3px}
+.phone-thread>span{color:#8f9f81}.phone-thread small{color:#809177}
+.phone-room{background:linear-gradient(180deg,#f2f3ec 0,#f6f5ef 38%)}
+.phone-room .conversation-heading{padding-top:20px;padding-bottom:14px;background:#f2f3ec;border-bottom:1px solid #e2e5da}
+.phone-room .conversation-heading h1{font-family:"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:18px;font-weight:600;letter-spacing:.2px;margin-top:5px}
+.phone-room .messages{padding-top:20px}
+.phone-room .message-column{max-width:720px}
+.phone-room .message{margin-bottom:10px;max-width:78%;gap:8px}
+.phone-room .message-avatar{width:30px;height:30px;margin-top:0}
+.phone-room .message-meta{margin:0 4px 3px;font-size:9px;gap:7px}
+.phone-room .message-meta span:first-child{display:none}
+.phone-room .message-meta time{font-size:8px;color:#a4ac9c}
+.phone-room .bubble{padding:9px 12px;border-radius:15px 15px 15px 4px;line-height:1.55;font-size:var(--message-size);box-shadow:none;background:#fff;border-color:#e2e6dc;margin-bottom:3px}
+.phone-room .user .bubble{border-radius:15px 15px 4px 15px;background:#dfe9d5;border-color:#d6e1cb;color:#3e4e3a}
+.phone-room .user .message-meta{justify-content:flex-end}
+.phone-room .phone-segment+.phone-segment{margin-top:3px}
+.phone-room .composer-wrap{padding-top:8px;background:#f2f3ec;border-top:1px solid #e1e5d9}
+.phone-room .composer{border-radius:22px;padding:10px 12px 7px;background:#fff;box-shadow:none}
+.phone-room .composer textarea{min-height:30px;line-height:1.5}
+.phone-room .composer-caption{margin-top:6px}
+.phone-welcome h2{font-family:"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:24px;letter-spacing:.4px}
+@media(max-width:760px){.phone-room .conversation-heading{padding:14px 16px 10px}.phone-room .messages{padding:12px 12px 16px}.phone-room .message{max-width:86%;margin-bottom:8px}.phone-room .bubble{padding:8px 11px;line-height:1.5}.room-badge{margin-top:5px}.phone-room .composer-wrap{padding:7px 9px max(9px,env(safe-area-inset-bottom))}}
+
+
+/* v0.2.8 phone-room density + readable desktop chat width */
+@media(min-width:761px){
+  .phone-room .conversation-heading{padding:12px 30px 9px;min-height:0}
+  .phone-room .conversation-heading h1{font-size:17px;line-height:1.35;margin-top:3px}
+  .phone-room .eyebrow{font-size:8px;letter-spacing:1.4px}
+  .phone-room .room-badge{margin-top:4px;padding:2px 7px;font-size:8px}
+  .phone-room .messages{padding:10px 30px 12px}
+  .phone-room .message-column{width:100%;max-width:920px;min-height:0}
+  .phone-room .message{max-width:min(72%,680px);margin-bottom:7px;gap:7px}
+  .phone-room .message-inner{max-width:100%}
+  .phone-room .message-avatar{width:27px;height:27px}
+  .phone-room .message-meta{margin:0 4px 2px;font-size:8px;line-height:1.25}
+  .phone-room .message-meta time{font-size:8px}
+  .phone-room .bubble{padding:7px 11px;line-height:1.45;font-size:clamp(14px,var(--message-size),17px);border-radius:14px 14px 14px 4px}
+  .phone-room .user .bubble{border-radius:14px 14px 4px 14px}
+  .phone-room .phone-segment+.phone-segment{margin-top:2px}
+  .phone-room .composer-wrap{padding:7px 30px 10px;background:#f2f3ec}
+  .phone-room .composer{max-width:920px;padding:8px 12px 6px;border-radius:18px}
+  .phone-room .composer textarea{min-height:25px;max-height:96px;line-height:1.45;font-size:clamp(14px,var(--message-size),17px)}
+  .phone-room .composer-bottom{margin-top:4px}
+  .phone-room .composer-caption{display:none}
+}
+@media(max-width:760px){
+  .phone-room .conversation-heading h1{font-size:16px;line-height:1.35}
+  .phone-room .message-column{min-height:0}
+  .phone-room .message{max-width:88%;margin-bottom:6px}
+  .phone-room .message-avatar{width:25px;height:25px}
+  .phone-room .message-meta{margin-bottom:2px;font-size:8px}
+  .phone-room .bubble{font-size:clamp(14px,var(--message-size),16px);padding:7px 10px;line-height:1.45}
+  .phone-room .composer-caption{display:none}
+}
+
+
+/* v0.2.9 phone-room desktop density + wider chat canvas */
+@media(min-width:761px){
+  .phone-room .conversation-heading{padding:9px 24px 7px}
+  .phone-room .messages{padding:7px 24px 9px}
+  .phone-room .message-column{width:100%;max-width:1120px}
+  .phone-room .message{max-width:min(82%,820px);margin-bottom:4px;gap:6px}
+  .phone-room .message-inner{max-width:820px}
+  .phone-room .message-avatar{width:26px;height:26px}
+  .phone-room .message-meta{margin:0 3px 1px;line-height:1.15}
+  .phone-room .bubble{padding:6px 10px;line-height:1.42}
+  .phone-room .phone-segment+.phone-segment{margin-top:1px}
+  .phone-room .composer-wrap{padding:6px 24px 8px}
+  .phone-room .composer{max-width:1120px;padding:7px 11px 5px}
+  .phone-room .composer textarea{min-height:23px;max-height:88px}
+}
+
+
+/* v0.3.0 compact shared chat chrome */
+.chat-mode .topbar{height:54px;padding:0 24px;gap:9px}
+.chat-mode .breadcrumb{gap:10px}
+.chat-mode .breadcrumb select{padding-top:5px;padding-bottom:5px}
+.chat-mode .conversation-heading{padding:12px 24px 9px;min-height:0;gap:14px}
+.chat-mode .conversation-heading h1{font-size:18px;line-height:1.35;margin-top:4px}
+.chat-mode .messages{padding:8px 24px 8px}
+.chat-mode .message{margin-bottom:12px;gap:8px}
+.chat-mode .message-meta{margin-bottom:3px}
+.chat-mode .bubble{padding:8px 11px;line-height:1.58}
+.chat-mode .composer-wrap{padding:5px 24px 6px;background:linear-gradient(transparent,var(--paper) 18%)}
+.chat-mode .composer{padding:8px 12px 6px;border-radius:16px}
+.chat-mode .composer textarea{min-height:27px;max-height:120px;line-height:1.5}
+.chat-mode .composer-bottom{margin-top:4px}
+.chat-mode .composer-caption{display:none}
+.heading-actions{align-self:flex-start;position:relative}
+.heading-menu{position:relative}
+.heading-menu>summary{list-style:none;cursor:pointer;font-size:22px;line-height:1;padding:0 0 5px}
+.heading-menu>summary::-webkit-details-marker{display:none}
+.heading-menu[open]>.heading-menu-trigger{background:#dde3d5;color:var(--green-dark)}
+.heading-menu-panel{position:absolute;right:0;top:39px;z-index:35;min-width:154px;padding:6px;background:#fffefa;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 35px #2637221c;display:grid;gap:2px}
+.heading-menu-panel button{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border-radius:8px;text-align:left;font-size:11px;color:var(--ink);white-space:nowrap}
+.heading-menu-panel button:hover{background:#edf0e6}
+.heading-menu-panel button svg{width:15px;height:15px;flex:none}
+.heading-menu-panel button.danger{color:#9a6f64}
+.heading-menu-panel button.danger:hover{background:#f4ece8}
+.phone-room .bubble{padding:4px 8px;line-height:1.42}
+.phone-room .message{margin-bottom:5px}
+.phone-room .message-meta{margin-bottom:1px}
+.phone-room .composer{padding:6px 10px 5px}
+.phone-room .composer textarea{min-height:23px;max-height:88px}
+@media(max-width:760px){
+ .chat-mode .topbar{height:50px;padding:0 10px}
+ .chat-mode .conversation-heading{padding:10px 14px 7px}
+ .chat-mode .messages{padding:7px 12px 7px}
+ .chat-mode .message{margin-bottom:9px}
+ .chat-mode .bubble{padding:7px 10px}
+ .phone-room .bubble{padding:4px 8px}
+ .chat-mode .composer-wrap{padding:5px 9px max(6px,env(safe-area-inset-bottom))}
+ .heading-menu-panel{right:0;top:35px}
+}
+.sync-key{-webkit-text-security:disc}
+
+.quoted-message{margin:0 0 5px;padding:5px 9px;border-inline-start:2px solid #87968a;color:#465747;background:#e8eee6;font-size:.85rem;overflow-wrap:anywhere;white-space:pre-wrap}
+.quote-action{border:0;background:none;color:#465747;font:inherit;font-size:.85rem;padding:5px 8px;cursor:pointer}
+.quote-draft{display:flex;gap:6px;align-items:center;grid-column:1/-1}
+.quote-draft blockquote{flex:1;min-width:0;margin:0}
+
+@media(max-width:760px){.topbar,.chat-mode .topbar{height:calc(50px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}.chat-mode .composer-wrap{padding-bottom:max(12px,env(safe-area-inset-bottom))}}</style></head>
+<body><div id="app"><div class="boot">正在開啟小倉庫…</div></div><dialog id="modal" aria-label="操作視窗"></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>(function(root){
+'use strict';
+const copy=x=>structuredClone(x),id=()=>globalThis.crypto?.randomUUID?.()||'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),now=()=>new Date().toISOString();
+const DEFAULT_MODEL_SETTINGS=Object.freeze({provider:'mock',model:'mock-fixed',contextMessages:20,retryCount:0,maxOutputTokens:1800});
+function normalizeModelSettings(value){const v=value&&typeof value==='object'?value:{};const contextMessages=Number(v.contextMessages),retryCount=Number(v.retryCount),maxOutputTokens=Number(v.maxOutputTokens);return {provider:typeof v.provider==='string'&&/^[a-z0-9._-]{1,60}$/i.test(v.provider)?v.provider:DEFAULT_MODEL_SETTINGS.provider,model:typeof v.model==='string'&&v.model.length<=120&&v.model.trim()?v.model.trim():DEFAULT_MODEL_SETTINGS.model,contextMessages:Number.isInteger(contextMessages)&&contextMessages>=1&&contextMessages<=50?contextMessages:DEFAULT_MODEL_SETTINGS.contextMessages,retryCount:Number.isInteger(retryCount)&&retryCount>=0&&retryCount<=2?retryCount:DEFAULT_MODEL_SETTINGS.retryCount,maxOutputTokens:Number.isInteger(maxOutputTokens)&&maxOutputTokens>=16&&maxOutputTokens<=4000?maxOutputTokens:DEFAULT_MODEL_SETTINGS.maxOutputTokens};}
+function seed(){const characterId=id(),worldId=id(),threadId=id();return {schema:1,characters:[{id:characterId,name:'示範角色',description:'可在「角色與世界」改成自己的角色。',persona:'以繁體中文自然聊天，根據當前對話回應。',avatar:''}],worlds:[{id:worldId,characterId,name:'日常',instructions:'日常與工作協作。不同世界與 IF 線的經歷不自動互通。',memory:''}],threads:[{id:threadId,worldId,title:'新的對話',roomType:'room',maxOutputTokens:null,createdAt:now(),updatedAt:now()}],messages:[],references:[],settings:{playerName:'妳',fontSize:16,model:copy(DEFAULT_MODEL_SETTINGS)},selected:{characterId,worldId,threadId}};}
+function validate(input){
+ if(!input||input.schema!==1)throw Error('不支援這份資料的版本。');const w=copy(input),ids=new Set();
+ for(const [k,max] of [['characters',100],['worlds',500],['threads',5000],['messages',100000],['references',1000]])if(!Array.isArray(w[k])||w[k].length>max)throw Error('資料不完整或超過本版容量：'+k);
+ const text=(x,max=200000)=>typeof x==='string'&&x.length<=max;
+ const unique=x=>{if(!x||typeof x.id!=='string'||!/^[-a-zA-Z0-9_]{1,100}$/.test(x.id)||ids.has(x.id))throw Error('資料識別碼重複或無效。');ids.add(x.id);};
+ if(!w.characters.length)throw Error('至少要留一個角色。');
+ for(const c of w.characters){unique(c);if(!text(c.name,60)||!c.name.trim()||!text(c.description,200)||!text(c.persona)||!text(c.avatar,3000000)||c.avatar&&!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(c.avatar))throw Error('角色資料格式不正確。');}
+ for(const x of w.worlds){unique(x);if(!w.characters.some(c=>c.id===x.characterId)||!text(x.name,80)||!x.name.trim()||!text(x.instructions)||!text(x.memory))throw Error('世界資料格式不正確。');}
+ for(const c of w.characters)if(!w.worlds.some(x=>x.characterId===c.id))throw Error('每個角色至少需要一個世界。');
+ for(const t of w.threads){if(t.roomType===undefined)t.roomType='room';if(t.maxOutputTokens===undefined)t.maxOutputTokens=null;unique(t);if(!w.worlds.some(x=>x.id===t.worldId)||!text(t.title,120)||!text(t.createdAt,80)||!text(t.updatedAt,80)||!['room','phone'].includes(t.roomType)||t.maxOutputTokens!==null&&(!Number.isInteger(t.maxOutputTokens)||t.maxOutputTokens<16||t.maxOutputTokens>4000))throw Error('對話資料格式不正確。');}
+ for(const m of w.messages){unique(m);if(!w.threads.some(t=>t.id===m.threadId)||!['user','assistant'].includes(m.role)||!text(m.content,32000)||!text(m.createdAt,80)||typeof m.mock!=='boolean')throw Error('訊息資料格式不正確。');}
+ const messageIndex=new Map(w.messages.map(m=>[m.id,m]));
+ for(const m of w.messages){
+  const quoted=messageIndex.get(m.replyTo);
+  if(!quoted||quoted===m||quoted.threadId!==m.threadId)delete m.replyTo;
+ }
+ for(const r of w.references){unique(r);if(!w.worlds.some(x=>x.id===r.worldId)||!text(r.name,200)||!text(r.content,250000))throw Error('Reference 資料格式不正確。');}
+ if(!w.settings||!text(w.settings.playerName,60)||![15,16,18,20].includes(w.settings.fontSize))throw Error('設定格式不正確。');w.settings.model=normalizeModelSettings(w.settings.model);
+ if(!w.selected||!w.characters.some(c=>c.id===w.selected.characterId)||!w.worlds.some(x=>x.id===w.selected.worldId&&x.characterId===w.selected.characterId)||w.selected.threadId!==null&&!w.threads.some(t=>t.id===w.selected.threadId&&t.worldId===w.selected.worldId))throw Error('目前的角色／世界／對話不相符。');
+ if(Object.hasOwn(w,'chatTransferRemoved'))delete w.chatTransferRemoved;
+ if(Object.hasOwn(w,'storyVault'))delete w.storyVault;return w;
+}
+function scope(w){const character=w.characters.find(c=>c.id===w.selected.characterId),world=w.worlds.find(x=>x.id===w.selected.worldId&&x.characterId===character.id),thread=w.threads.find(t=>t.id===w.selected.threadId&&t.worldId===world.id);return {character,world,thread};}
+function contextMessages(w,threadId,limit){
+ const messages=w.messages.filter(m=>m.threadId===threadId);
+ const selected=messages.slice(-limit);
+ const quotedIds=new Set(selected.map(m=>m.replyTo).filter(Boolean));
+ const quotes=new Map(messages.filter(m=>quotedIds.has(m.id)).map(m=>[m.id,m.content.slice(0,500)]));
+ return selected.map(m=>{
+  const quote=quotes.get(m.replyTo);
+  const content=quote?'【引用】\n'+quote+'\n【本則訊息】\n'+m.content:m.content;
+  return {role:m.role,content};
+ });
+}
+function context(w,options={}){const {character,world,thread}=scope(w),model=normalizeModelSettings(w.settings?.model),limit=Number.isInteger(options.messageLimit)?Math.max(1,Math.min(50,options.messageLimit)):model.contextMessages,effectiveMax=Number.isInteger(thread?.maxOutputTokens)?thread.maxOutputTokens:model.maxOutputTokens;return {character:{id:character.id,name:character.name,persona:character.persona},world:{id:world.id,name:world.name,instructions:world.instructions,memory:world.memory},room:{type:thread?.roomType||'room',maxOutputTokens:effectiveMax},references:w.references.filter(r=>r.worldId===world.id).map(r=>({name:r.name,content:r.content})),messages:thread?contextMessages(w,thread.id,limit):[],request:{provider:model.provider,model:model.model,contextMessages:limit,maxOutputTokens:effectiveMax}};}
+function backup(w){return {format:'moonlit-chat-backup',version:1,exportedAt:now(),workspace:validate(w)};}
+function readBackup(v){if(!['moonlit-chat-backup','moonlit-home-backup'].includes(v?.format)||v.version!==1)throw Error('請選擇月光聊天室備份；舊版月光小屋整包備份也可匯入，故事館資料會自動忽略。');return validate(v.workspace);}
+function characterPackage(w,characterId,history=false){const character=w.characters.find(c=>c.id===characterId);if(!character)throw Error('找不到角色。');const worlds=w.worlds.filter(x=>x.characterId===characterId).map(x=>({...x,memory:history?x.memory:''}));const threads=history?w.threads.filter(t=>worlds.some(x=>x.id===t.worldId)):[];return {format:'moonlit-character',version:1,includesHistory:history,character:copy(character),worlds:copy(worlds),threads:copy(threads),messages:history?copy(w.messages.filter(m=>threads.some(t=>t.id===m.threadId))):[],references:copy(w.references.filter(r=>worlds.some(x=>x.id===r.worldId)))};}
+function addPackage(w,p){
+ if(p?.format!=='moonlit-character'||p.version!==1||!p.character||!Array.isArray(p.worlds)||!Array.isArray(p.threads)||!Array.isArray(p.messages)||!Array.isArray(p.references))throw Error('這不是可用的角色資料包。');
+ const candidate=validate({schema:1,characters:[p.character],worlds:p.worlds,threads:p.threads,messages:p.messages,references:p.references,settings:{playerName:'妳',fontSize:16,model:copy(DEFAULT_MODEL_SETTINGS)},selected:{characterId:p.character.id,worldId:p.worlds[0]?.id,threadId:p.threads.find(t=>t.worldId===p.worlds[0]?.id)?.id||null}});
+ const map=new Map();for(const k of ['characters','worlds','threads','messages','references'])for(const x of candidate[k])map.set(x.id,id());
+ const c={...candidate.characters[0],id:map.get(candidate.characters[0].id)};w.characters.push(c);
+ for(const x of candidate.worlds)w.worlds.push({...x,id:map.get(x.id),characterId:c.id});
+ for(const t of candidate.threads)w.threads.push({...t,id:map.get(t.id),worldId:map.get(t.worldId)});
+ for(const m of candidate.messages)w.messages.push({...m,id:map.get(m.id),threadId:map.get(m.threadId),replyTo:map.get(m.replyTo)});
+ for(const r of candidate.references)w.references.push({...r,id:map.get(r.id),worldId:map.get(r.worldId)});
+ w.selected={characterId:c.id,worldId:map.get(candidate.worlds[0].id),threadId:map.get(candidate.selected.threadId)||null};return validate(w);
+}
+function deleteThread(w,threadId){const t=w.threads.find(t=>t.id===threadId);if(!t)return;w.threads=w.threads.filter(t=>t.id!==threadId);w.messages=w.messages.filter(m=>m.threadId!==threadId);if(w.selected.threadId===threadId)w.selected.threadId=w.threads.find(t=>t.worldId===w.selected.worldId)?.id||null;}
+class ProviderError extends Error{constructor(message,{code='provider_error',retryable=false,cause}={}){super(message);this.name='ProviderError';this.code=code;this.retryable=retryable;if(cause)this.cause=cause;}}
+const providers=new Map();
+function registerProvider(provider){if(!provider||typeof provider.id!=='string'||!/^[a-z0-9._-]{1,60}$/i.test(provider.id)||typeof provider.generate!=='function')throw Error('Provider 格式不正確。');const models=Array.isArray(provider.models)&&provider.models.length?provider.models.map(x=>typeof x==='string'?{id:x,label:x}:x).filter(x=>x&&typeof x.id==='string'&&x.id.trim()).map(x=>({id:x.id.trim().slice(0,120),label:String(x.label||x.id).slice(0,120)})):[{id:'default',label:'Default'}];provider.models=models;providers.set(provider.id,provider);return provider;}
+function providerCatalog(){return [...providers.values()].map(p=>({id:p.id,label:String(p.label||p.id),description:String(p.description||''),external:Boolean(p.external),models:copy(p.models)}));}
+class MockProvider{constructor(){this.id='mock';this.label='Mock Provider';this.description='固定測試回覆，不會呼叫外部模型。';this.external=false;this.models=[{id:'mock-fixed',label:'固定測試回覆'}];}async generate(request,{signal,onDelta}={}){if(signal?.aborted)throw new ProviderError('已取消這次回覆。',{code:'cancelled'});const content='我收到這句了。先把它留在這裡。\n\n這是「'+request.character.name+'」的固定測試回覆，尚未連接模型，也沒有把對話送到外部服務。';if(onDelta)onDelta(content);return {role:'assistant',content,mock:true};}}
+registerProvider(new MockProvider());
+function abortError(){return new ProviderError('已取消這次回覆。',{code:'cancelled'});}
+function wait(ms,signal){return new Promise((resolve,reject)=>{if(signal?.aborted)return reject(abortError());const timer=setTimeout(resolve,ms);if(signal)signal.addEventListener('abort',()=>{clearTimeout(timer);reject(abortError());},{once:true});});}
+async function generateWithRetry(provider,request,{signal,model,retryCount=0,onDelta}={}){let attempt=0;for(;;){if(signal?.aborted)throw abortError();try{return await provider.generate(request,{signal,model,onDelta,attempt});}catch(error){if(signal?.aborted||error?.code==='cancelled'||error?.name==='AbortError')throw abortError();const wrapped=error instanceof ProviderError?error:new ProviderError(error?.message||'模型回覆失敗。',{cause:error});if(!wrapped.retryable||attempt>=retryCount)throw wrapped;attempt++;await wait(250*attempt,signal);}}}
+function normalizeAnswer(answer,provider){if(!answer||answer.role!=='assistant'||typeof answer.content!=='string'||answer.content.length>32000)throw new ProviderError('Provider 回傳格式不正確。',{code:'invalid_response'});return {role:'assistant',content:answer.content,mock:Boolean(answer.mock??!provider.external)};}
+class WorkspaceService{
+ constructor(repository,workspace){this.repository=repository;this.workspace=validate(workspace);this.tail=Promise.resolve();this.activeController=null;}
+ change(mutate){const job=this.tail.then(async()=>{const next=copy(this.workspace);await mutate(next);const valid=validate(next);await this.repository.save(valid);this.workspace=valid;return valid;});this.tail=job.catch(()=>{});return job;}
+ replace(w){const next=validate(w);return this.change(draft=>{for(const k of Object.keys(draft))delete draft[k];Object.assign(draft,next);});}
+ cancel(){if(this.activeController&&!this.activeController.signal.aborted){this.activeController.abort();return true;}return false;}
+ async send(content,{onDelta,mockOnly=false,modelOverride,replyTo}={}){
+  if(!content.trim()||content.length>32000)throw Error('請輸入 1–32,000 個字。');
+  if(this.activeController)throw Error('上一則回覆仍在處理中。');
+  const controller=new AbortController();this.activeController=controller;
+  const guardedDelta=value=>{if(!controller.signal.aborted)onDelta?.(value);};
+  try{return await this.change(async w=>{
+   let {world,thread}=scope(w);
+   if(!thread){thread={id:id(),worldId:world.id,title:content.trim().slice(0,24),roomType:'room',maxOutputTokens:null,createdAt:now(),updatedAt:now()};w.threads.push(thread);w.selected.threadId=thread.id;}
+   const first=!w.messages.some(m=>m.threadId===thread.id);
+   const message={id:id(),threadId:thread.id,role:'user',content:content.trim(),createdAt:now(),mock:false};
+   if(w.messages.some(m=>m.id===replyTo&&m.threadId===thread.id))message.replyTo=replyTo;
+   w.messages.push(message);
+   if(first)thread.title=content.trim().slice(0,24);
+   const model=normalizeModelSettings(mockOnly?{...w.settings.model,provider:'mock',model:'mock-fixed'}:modelOverride??w.settings.model),provider=providers.get(model.provider);
+   if(!provider)throw new ProviderError('目前沒有安裝「'+model.provider+'」Provider。',{code:'provider_missing'});
+   if(provider.id!=='gemini'&&provider.models.length&&!provider.models.some(x=>x.id===model.model))throw new ProviderError('目前 Provider 不支援「'+model.model+'」模型。',{code:'model_missing'});
+   const rawAnswer=await generateWithRetry(provider,context(mockOnly||modelOverride?{...w,settings:{...w.settings,model}}:w),{signal:controller.signal,model:model.model,retryCount:model.retryCount,onDelta:guardedDelta});
+   if(controller.signal.aborted)throw abortError();
+   const answer=normalizeAnswer(rawAnswer,provider);
+   if(controller.signal.aborted)throw abortError();
+   w.messages.push({...answer,id:id(),threadId:thread.id,createdAt:now()});
+   thread.updatedAt=now();
+   if(controller.signal.aborted)throw abortError();
+  });}finally{if(this.activeController===controller)this.activeController=null;}
+ }
+}
+const api={id,now,copy,DEFAULT_MODEL_SETTINGS,normalizeModelSettings,seed,validate,scope,context,backup,readBackup,characterPackage,addPackage,deleteThread,ProviderError,MockProvider,providers,registerProvider,providerCatalog,generateWithRetry,WorkspaceService};
+if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ChatCore=api;
+})(globalThis);
+
+(function(root){
+'use strict';
+class BrowserRepository{
+ constructor(){this.db=null;this.revision=0;this.name='本機瀏覽器 · IndexedDB';}
+ async open(){this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open('little-storage-v1:'+new URL('./',location.href).pathname,1);r.onupgradeneeded=()=>r.result.createObjectStore('workspace');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('請先關閉其他聊天室分頁，再重新開啟。'));});return this;}
+ async load(){return new Promise((resolve,reject)=>{const tx=this.db.transaction('workspace','readonly'),r=tx.objectStore('workspace').get('current');tx.oncomplete=()=>{const record=r.result;this.revision=record?.revision||0;resolve(record?.data||null);};tx.onerror=()=>reject(tx.error);});}
+ async save(data){if(new TextEncoder().encode(JSON.stringify(data)).byteLength>20000000)throw Error('本版工作區上限 20 MB，請先備份並整理資料。');return new Promise((resolve,reject)=>{const tx=this.db.transaction('workspace','readwrite'),store=tx.objectStore('workspace'),read=store.get('current');let conflict=false;read.onsuccess=()=>{if((read.result?.revision||0)!==this.revision){conflict=true;tx.abort();return;}store.put({revision:this.revision+1,data},'current');};tx.oncomplete=()=>{this.revision++;resolve();};tx.onabort=()=>reject(Error(conflict?'另一個分頁已修改資料。請先備份目前資料，再重新整理。':'儲存失敗；本次變更未寫入。'));tx.onerror=()=>reject(tx.error||Error('本機儲存失敗。'));});}
+}
+root.ChatStorage={async open(){return new BrowserRepository().open();}};
+})(globalThis);
+
+(function(root){
+'use strict';
+const C=typeof module!=='undefined'&&module.exports?require('./core.js'):root.ChatCore;
+if(!C)throw Error('ChatCore 尚未載入。');
+
+const MAX_INSTRUCTION_CHARS=60000;
+const MAX_MESSAGE_CHARS=80000;
+const DEFAULT_MAX_OUTPUT_TOKENS=1800;
+function clean(value){return typeof value==='string'?value.trim():'';}
+function clip(text,max){const s=String(text||'');return s.length<=max?s:s.slice(0,max)+'\n\n[內容因本次 API 預算上限而截斷]';}
+function buildSystem(request){
+ const parts=[];const character=request?.character||{},world=request?.world||{},refs=Array.isArray(request?.references)?request.references:[];
+ parts.push(`你現在以角色「${clean(character.name)||'角色'}」的身份回覆。`);
+ if(clean(character.persona))parts.push('【角色核心】\n'+clean(character.persona));
+ if(clean(world.name))parts.push('【目前世界／IF】\n'+clean(world.name));
+ if(clean(world.instructions))parts.push('【世界設定】\n'+clean(world.instructions));
+ if(clean(world.memory))parts.push('【此世界的手動記憶】\n'+clean(world.memory));
+ if(refs.length){let used=0,omitted=0;const blocks=[];for(const r of refs){const block=`【參考資料：${clean(r.name)||'未命名'}】\n${clean(r.content)}`;if(used+block.length>45000){omitted++;continue;}blocks.push(block);used+=block.length;}if(omitted)blocks.push(`[另有 ${omitted} 份參考資料因本次 API 預算上限未帶入]`);if(blocks.length)parts.push(blocks.join('\n\n'));}
+ if(request?.room?.type==='phone')parts.push('【目前房型】\n手機短訊息房。這是一對一自然即時聊天，不是場景生成、設計稿、摘要、關鍵字抽取或標籤列舉。第一優先是理解並直接回應使用者最新一句的語意、情緒與關係意圖。若使用者是在打招呼、測試、吐槽、撒嬌或閒聊，請像真人聊天一樣自然接話。除非使用者明確要求，禁止只輸出場景詞、風格詞、地點詞、標籤、名詞片段、提綱或關鍵字清單；不要因參考資料裡出現某些描述詞，就把那些詞直接當成答案。保持即時通訊節奏，通常一到數個短訊息，不主動展開長篇敘事；但短不等於殘缺，每一則都必須語意完整並承接上一句。需要時可用空行分成 1–3 個短泡泡。角色設定與使用者當下要求仍然優先。');
+ parts.push('請遵守以上角色、世界與記憶邊界。不要假裝知道未提供的共同經歷；若資料彼此衝突，以較具體、較新的當前對話為準。');
+ return clip(parts.join('\n\n'),MAX_INSTRUCTION_CHARS);
+}
+function buildContents(request){
+ const source=Array.isArray(request?.messages)?request.messages:[];const chosen=[];let used=0;
+ for(let i=source.length-1;i>=0;i--){const m=source[i];if(!m||!['user','assistant'].includes(m.role)||typeof m.content!=='string')continue;const remaining=MAX_MESSAGE_CHARS-used;if(remaining<=0)break;const text=m.content.length<=remaining?m.content:m.content.slice(m.content.length-remaining);chosen.push({role:m.role==='assistant'?'model':'user',parts:[{text}]});used+=text.length;}
+ return chosen.reverse();
+}
+function buildGeminiRequest(request,model){return {model,systemInstruction:{parts:[{text:buildSystem(request)}]},contents:buildContents(request),generationConfig:{maxOutputTokens:Number.isInteger(request?.request?.maxOutputTokens)?Math.max(16,Math.min(4000,request.request.maxOutputTokens)):DEFAULT_MAX_OUTPUT_TOKENS}};}
+function providerError(message,status){const retryable=status===408||status===409||status===429||(status>=500&&status<=599);const code=status===401||status===403?'auth_error':status===429?'rate_limited':status>=500?'service_unavailable':'provider_error';return new C.ProviderError(message||'Gemini API 回覆失敗。',{code,retryable});}
+async function browserTransport(payload,{signal}={}){
+ if(root.__TAURI__?.core?.invoke){
+  const invoke=root.__TAURI__.core.invoke;
+  if(signal?.aborted)throw new C.ProviderError('已取消這次回覆。',{code:'cancelled'});
+  const requestId='model-'+(globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
+  const cancelNative=()=>{Promise.resolve(invoke('cancel_model_request',{requestId})).catch(()=>{});};
+  signal?.addEventListener('abort',cancelNative,{once:true});
+  try{
+   const result=await invoke('gemini_generate',{request:payload,requestId});
+   if(signal?.aborted)throw new C.ProviderError('已取消這次回覆。',{code:'cancelled'});
+   return result;
+  }catch(error){
+   if(signal?.aborted||String(error||'').includes('已取消這次回覆'))throw new C.ProviderError('已取消這次回覆。',{code:'cancelled'});
+   throw new C.ProviderError(String(error||'Tauri Gemini bridge 失敗。'),{code:'bridge_error'});
+  }finally{signal?.removeEventListener?.('abort',cancelNative);}
+ }
+ if(location?.protocol==='file:')throw new C.ProviderError('Gemini API 模式不能直接雙擊 HTML。請改用「00_START_API.cmd」。',{code:'bridge_missing'});
+ let response;try{response=await fetch('/api/google/generate-content',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),signal});}catch(error){if(signal?.aborted)throw new C.ProviderError('已取消這次回覆。',{code:'cancelled'});throw new C.ProviderError('連不到本機 API 橋接層。請用「00_START_API.cmd」開啟。',{code:'bridge_unreachable',retryable:true,cause:error});}
+ let data={};try{data=await response.json();}catch(error){if(signal?.aborted)throw new C.ProviderError('已取消這次回覆。',{code:'cancelled'});}if(signal?.aborted)throw new C.ProviderError('已取消這次回覆。',{code:'cancelled'});if(!response.ok)throw providerError(data?.error||data?.message||`Gemini API 錯誤 (${response.status})`,response.status);return data;
+}
+class GeminiProvider{
+ constructor(transport=browserTransport){this.id='gemini';this.label='Google · Gemini';this.description='透過本機安全橋接層呼叫 Gemini Generate Content API；API key 不會寫入前端或備份。';this.external=true;this.models=[{id:'gemini-3.5-flash-lite',label:'Gemini 3.5 Flash-Lite · 省用量'},{id:'gemini-3.6-flash',label:'Gemini 3.6 Flash · 穩定快速'},{id:'gemini-3.8-flash',label:'Gemini 3.8 Flash · 穩定主力'},{id:'gemini-4-hydrogen',label:'Gemini 4 Hydrogen · 4H / 快速'},{id:'gemini-4-carbon',label:'Gemini 4 Carbon · 高階（付費）'},{id:'gemini-4-argon',label:'Gemini 4 Argon · 旗艦推理（付費）'}];this.transport=transport;}
+ async generate(request,{signal,model,onDelta}={}){const data=await this.transport(buildGeminiRequest(request,model),{signal});const content=clean(data?.text);if(!content)throw new C.ProviderError('Gemini API 沒有回傳可顯示的文字。',{code:'invalid_response'});onDelta?.(content);return {role:'assistant',content,mock:false};}
+}
+C.registerProvider(new GeminiProvider());
+const api={GeminiProvider,buildSystem,buildContents,buildGeminiRequest,browserTransport};
+if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.MoonlitGemini=api;
+})(globalThis);
+
+(function (root) {
+'use strict';
+const keyName = 'little-storage-gemini-key:'+new URL('./',location.href).pathname;
+let key = '';
+try { key = localStorage.getItem(keyName) || ''; } catch (_) {}
+
+const provider = ChatCore.providerCatalog().find(item => item.id === 'gemini');
+const defaultModel = 'gemini-flash-latest';
+const models = [{id:defaultModel, label:'Gemini Flash · 最新版'}, ...provider.models];
+const GeminiProvider = MoonlitGemini.GeminiProvider;
+
+async function generate(payload, {signal} = {}) {
+ if (!key) throw new ChatCore.ProviderError('請先在「設定與備份」加入 Gemini API 金鑰。', {code:'key_missing'});
+ const {model, ...body} = payload;
+ if (!/^[-a-zA-Z0-9_.]{1,120}$/.test(model)) throw new ChatCore.ProviderError('請檢查 Gemini 模型 ID。');
+ const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent';
+ let response;
+ try {
+  response = await fetch(url, {
+   method:'POST', signal, redirect:'error', credentials:'omit', cache:'no-store', referrerPolicy:'no-referrer',
+   headers:{'content-type':'application/json','x-goog-api-key':key},
+   body:JSON.stringify(body)
+  });
+ } catch (error) {
+  if (signal?.aborted) throw new ChatCore.ProviderError('已取消這次回覆。', {code:'cancelled'});
+  throw new ChatCore.ProviderError('連不到 Gemini，請檢查手機連線後再試。', {retryable:true, cause:error});
+ }
+ if (!response.ok) {
+  const details = {
+   400:'Gemini 拒絕了這次請求，請檢查金鑰與模型設定。',
+   401:'Gemini 金鑰無效，請重新確認。',
+   403:'Gemini 拒絕存取，請檢查金鑰限制與帳戶權限。',
+   404:'找不到這個 Gemini 模型，請換用帳戶可使用的模型 ID。',
+   429:'Gemini 額度或速率已達上限，請稍後再試。'
+  };
+  throw new ChatCore.ProviderError(details[response.status] || 'Gemini 暫時無法回覆（HTTP ' + response.status + '）。',
+   {retryable:response.status === 429 || response.status >= 500});
+ }
+ const data = await response.json();
+ const parts = data?.candidates?.[0]?.content?.parts || [];
+ return {text:parts.filter(part=>!part.thought && typeof part.text === 'string').map(part=>part.text).join('')};
+}
+const gemini = new GeminiProvider(generate);
+gemini.models = models;
+gemini.description = '由這台裝置直接連線 Google Gemini。';
+ChatCore.registerProvider(gemini);
+root.MoonlitWeb = {
+ defaultModel,
+ hasKey:()=>Boolean(key),
+ saveKey(value, remember) {
+  if (value && !/^[-a-zA-Z0-9_]{15,200}$/.test(value)) throw Error('Gemini 金鑰格式不正確。');
+  try {
+   if (remember && value) localStorage.setItem(keyName, value);
+   else localStorage.removeItem(keyName);
+  } catch (error) {
+   if (remember || !value) throw Error('無法更新 Safari 的金鑰儲存設定。');
+  }
+  key = value;
+ }
+};
+if ('serviceWorker' in navigator && location.protocol !== 'file:' && root.isSecureContext) {
+ window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+})(globalThis);
+
+(function () {
+'use strict';
+const C=ChatCore, $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const paths={moon:'M21 13A9 9 0 0 1 11 3 9 9 0 1 0 21 13Z',plus:'M12 5v14M5 12h14',chat:'M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-2 2V11.5a9.5 9.5 0 0 1 19 0ZM7 9h9M7 13h6',user:'M20 21v-2a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v2M16 5a4 4 0 1 1-8 0 4 4 0 0 1 8 0',book:'M12 21V5M12 5C8 2 4 3 2 4v15c4-2 7-1 10 2 3-3 6-4 10-2V4c-2-1-6-2-10 1Z',settings:'M19.391 8.939L19.825 10.337L21.781 9.921L21.781 14.079L19.825 13.663L19.391 15.061L18.709 16.357L20.387 17.446L17.446 20.387L16.357 18.709L15.061 19.391L13.663 19.825L14.079 21.781L9.921 21.781L10.337 19.825L8.939 19.391L7.643 18.709L6.554 20.387L3.613 17.446L5.291 16.357L4.609 15.061L4.175 13.663L2.219 14.079L2.219 9.921L4.175 10.337L4.609 8.939L5.291 7.643L3.613 6.554L6.554 3.613L7.643 5.291L8.939 4.609L10.337 4.175L9.921 2.219L14.079 2.219L13.663 4.175L15.061 4.609L16.357 5.291L17.446 3.613L20.387 6.554L18.709 7.643ZM15.5 12a3.5 3.5 0 1 0-7 0a3.5 3.5 0 1 0 7 0Z',send:'m22 2-7 20-4-9-9-4 20-7ZM22 2 11 13',menu:'M4 6h16M4 12h16M4 18h16',close:'m6 6 12 12M6 18 18 6',chevron:'m9 5 7 7-7 7',download:'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5',upload:'M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5',check:'m5 12 4 4L19 6',trash:'M3 6h18M8 6V3h8v3M6 6l1 15h10l1-15M10 10v7M14 10v7',edit:'m16 3 5 5-12 12-6 1 1-6L16 3ZM14 5l5 5',file:'M14 2H4v20h16V8l-6-6ZM14 2v6h6M8 13h8M8 17h6',shield:'M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6L12 2Zm-5 10 3 3 7-7',copy:'M9 9h12v12H9zM5 15H3V3h12v2',search:'M21 21l-6-6M17 9A8 8 0 1 1 1 9a8 8 0 0 1 16 0',stop:'M7 7h10v10H7z'};
+const icon=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[n]?`<path d="${paths[n]}"/>`:''}</svg>`;
+const avatar=(c,cls='')=>c.avatar?`<img class="avatar ${cls}" src="${esc(c.avatar)}" alt="${esc(c.name)}的頭像">`:`<span class="avatar initials ${cls}" aria-hidden="true">${esc(c.name.slice(0,1))}</span>`;
+let service,repo,view='chat',busy=false,drawer=false,search='',drafts=new Map(),toastTimer,sendError='';
+const providerCatalog=()=>C.providerCatalog();
+function modelSettings(){
+ const stored=C.normalizeModelSettings(w().settings.model);
+ return ['gemini','mock'].includes(stored.provider)?stored:{...stored,provider:'mock',model:'mock-fixed'};
+}
+const w=()=>service.workspace, scope=()=>C.scope(w()), draftKey=()=>w().selected.worldId+'/'+(w().selected.threadId||'new');
+const replyDrafts=new Map();
+const roomType=t=>t?.roomType==='phone'?'phone':'room', roomLabel=t=>roomType(t)==='phone'?'手機房':'長聊房', roomTokens=t=>Number.isInteger(t?.maxOutputTokens)?t.maxOutputTokens:modelSettings().maxOutputTokens;
+function renderBubbleContent(content,phone=false){return `<div class="bubble${phone?' phone-segment':''}">${esc(content)}</div>`;}
+function toast(message,error=false){const e=$('#toast');e.textContent=message;e.className='toast visible'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.className='toast',6000);}
+function date(s,opts){const d=new Date(s);return Number.isNaN(+d)?'':d.toLocaleString('zh-TW',opts||{hour:'2-digit',minute:'2-digit',hour12:false});}
+function retainDraft(){const t=$('#message-input');if(t)drafts.set(draftKey(),t.value);}
+async function change(fn,message){if(busy)return false;retainDraft();busy=true;document.body.classList.add('working');try{await service.change(fn);if(message)toast(message);return true;}catch(e){toast(e.message||'儲存失敗，請匯出備份。',true);return false;}finally{busy=false;document.body.classList.remove('working');render();}}
+function navButton(route,label,n){return `<button class="nav-item ${view===route?'active':''}" data-view="${route}">${icon(n)}<span>${label}</span>${view===route?'<span class="nav-dot"></span>':''}</button>`;}
+function render(){
+ const {character,world,thread}=scope(),model=modelSettings(),provider=providerCatalog().find(p=>p.id===model.provider);
+ const oldSidebar=$('.sidebar-scroll'),sidebarScrollTop=oldSidebar?.dataset.scope===world.id?oldSidebar.scrollTop:0;
+ document.documentElement.style.setProperty('--message-size',w().settings.fontSize+'px');
+ const unread=new Set(w().messages.filter(m=>m.unread===true).map(m=>m.threadId));
+ for(const thread of w().threads)if(thread.unread===true)unread.add(thread.id);
+ const threads=w().threads.filter(t=>t.worldId===world.id&&t.title.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
+ $('#app').innerHTML=`<button class="drawer-backdrop ${drawer?'visible':''}" data-action="close-drawer" aria-label="關閉選單"></button><aside class="sidebar ${drawer?'open':''}">
+ <div class="brand"><span class="brand-icon">${icon('moon')}</span><div>小倉庫<small>PRIVATE CHAT</small></div><button class="icon-btn mobile-only" data-action="close-drawer" aria-label="關閉選單">${icon('close')}</button></div>
+ <div class="sidebar-scroll" data-scope="${world.id}" role="region" aria-label="角色與對話列表" tabindex="0"><div class="character-switch"><label for="character-select">現在，和誰說話</label><div class="select-with-avatar">${avatar(character)}<select id="character-select" aria-label="切換角色">${w().characters.map(c=>`<option value="${c.id}" ${c.id===character.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select><button class="icon-btn" data-action="new-character" title="新增角色" aria-label="新增角色">${icon('plus')}</button></div></div>
+ <nav aria-label="主要導覽">${navButton('chat','聊天室','chat')}${navButton('profile','角色與世界','user')}</nav>
+ <div class="thread-heading"><span>這個世界的對話</span><button class="icon-btn" data-action="new-thread" aria-label="新增對話" title="新增對話">${icon('plus')}</button></div>
+ <label class="search-box">${icon('search')}<input id="thread-search" placeholder="找一段對話" value="${esc(search)}" aria-label="搜尋目前世界的對話"></label>
+ <div class="thread-list">${threads.map(t=>`<button class="thread ${t.id===thread?.id?'selected':''} ${roomType(t)==='phone'?'phone-thread':''}" data-thread="${t.id}"><span>${icon('chat')}</span><div>${esc(t.title)}<small>${roomLabel(t)} · ${date(t.updatedAt,{month:'short',day:'numeric'})}${unread.has(t.id)?' · 未讀':''}</small></div></button>`).join('')||'<div class="list-empty">還沒有對話，<br>從一句話開始就好。</div>'}</div></div>
+ <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>iPhone 網頁版</span></div></div></aside>
+ <main class="main ${view==='chat'?'chat-mode':''}"><header class="topbar"><button class="icon-btn mobile-only" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button><div class="breadcrumb"><span>${esc(character.name)}</span><span class="slash">/</span><select id="world-select" aria-label="切換世界">${w().worlds.filter(x=>x.characterId===character.id).map(x=>`<option value="${x.id}" ${x.id===world.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div><span class="provider-pill"><i></i>${esc(provider?.label||model.provider)}<span class="wide-text"> · ${esc(model.model)}</span></span><button class="icon-btn context-button" data-action="context" aria-label="查看本次上下文" title="查看本次上下文">${icon('file')}</button></header>
+ ${view==='chat'?chatPage(character,world,thread):view==='profile'?profilePage(character,world):settingsPage()}
+ </main>`;
+ $('.sidebar-scroll').scrollTop=sidebarScrollTop;bind();if(view==='chat'){const t=$('#message-input');t.value=drafts.get(draftKey())||'';resizeInput();scrollMessages();}
+}
+function quoteBlock(message){
+ return `<blockquote class="quoted-message">${esc(message.content.slice(0,140))}${message.content.length>140?'…':''}</blockquote>`;
+}
+function chatPage(c,world,t){
+ const messages=t?w().messages.filter(m=>m.threadId===t.id):[],phone=roomType(t)==='phone',effectiveTokens=t?roomTokens(t):modelSettings().maxOutputTokens;
+ const byId=new Map(messages.map(m=>[m.id,m]));
+ const composerQuote=byId.get(replyDrafts.get(draftKey()));
+ const messageHtml=messages.map(m=>`<article class="message ${m.role}">${m.role==='assistant'?avatar(c,'message-avatar'):''}<div class="message-inner"><div class="message-meta"><span>${esc(m.role==='user'?w().settings.playerName||'妳':c.name)}</span>${m.mock?'<span class="mock-label">固定測試回覆</span>':''}<time>${date(m.createdAt)}</time></div>${byId.has(m.replyTo)?quoteBlock(byId.get(m.replyTo)):''}${renderBubbleContent(m.content,phone)}<button type="button" class="quote-action" data-quote="${m.id}" aria-label="引用這則訊息">引用</button></div></article>`).join('');
+ const empty=phone?`<div class="welcome phone-welcome"><div class="welcome-portrait">${avatar(c)}<span>${icon('chat')}</span></div><span class="eyebrow">PHONE ROOM</span><h2>${esc(c.name)}</h2><p>短短地說也可以，這裡比較像手機聊天。</p><div class="welcome-note">${icon('shield')}<span>共用「${esc(world.name)}」的角色與世界資料，<br>這間房的回覆上限預設較短。</span></div></div>`:`<div class="welcome"><div class="welcome-portrait">${avatar(c)}<span>${icon('moon')}</span></div><span class="eyebrow">A LITTLE ROOM FOR YOUR WORDS</span><h2>留一盞燈，慢慢說。</h2><p>${esc(c.description||'今天想從哪裡開始？')}</p><div class="welcome-note">${icon('shield')}<span>${modelSettings().provider==='mock'?'對話留在本機。現在是介面測試，<br>送出後會收到一則固定示範回覆。':'對話留在本機。送出後會由選定的模型回覆。'}</span></div><div class="prompt-chips"><button data-prompt="今天，想先和你說一件小事。">今天的小事 ${icon('chevron')}</button><button data-prompt="我們把下一個故事，慢慢整理好。">整理故事 ${icon('chevron')}</button></div></div>`;
+ return `<section class="chat-view ${phone?'phone-room':'long-room'}"><div class="conversation-heading"><div><span class="eyebrow">${esc(world.name)} · ${phone?'PHONE ROOM':'PRIVATE SPACE'}</span><h1>${esc(t?.title||'新的對話')}</h1>${t?`<span class="room-badge">${roomLabel(t)} · ${effectiveTokens} tokens</span>`:''}</div><div class="heading-actions">${t?`<details class="heading-menu"><summary class="icon-btn heading-menu-trigger" aria-label="更多房間操作" title="更多房間操作">⋯</summary><div class="heading-menu-panel"><button type="button" data-action="room-settings">${icon('settings')}<span>房間設定</span></button><button type="button" data-action="mark-unread">標為未讀</button><button type="button" data-action="rename-thread">${icon('edit')}<span>重新命名</span></button><button type="button" data-action="export-thread">${icon('download')}<span>匯出這段對話</span></button><button type="button" class="danger" data-action="delete-thread">${icon('trash')}<span>刪除對話</span></button></div></details>`:''}</div></div>
+ <div class="messages" id="messages" role="log" aria-label="聊天紀錄"><div class="message-column">${messages.length?`${phone?'':`<div class="date-divider"><span>${date(messages[0].createdAt,{year:'numeric',month:'long',day:'numeric'})}</span></div>`}${messageHtml}`:empty}</div></div>
+ ${sendError?`<div class="send-error" role="alert"><strong>上一則沒有送成功</strong><span>${esc(sendError)}</span></div>`:''}<div class="composer-wrap"><form id="compose-form" class="composer">${composerQuote?`<div class="quote-draft">${quoteBlock(composerQuote)}<button type="button" class="quote-action" id="clear-quote" aria-label="取消引用">取消</button></div>`: ''}<label for="message-input" class="sr-only">訊息</label><textarea id="message-input" rows="1" maxlength="32000" placeholder="${phone?'訊息…':'把想說的話，留在這裡…'}"></textarea><div class="composer-bottom"><span>${icon('shield')}${phone?`手機房 · ${effectiveTokens} tokens`:'僅存於本機'} <span class="desktop-hint">· Enter 送出，Shift + Enter 換行</span></span><button class="send-button" type="submit" aria-label="送出訊息">${icon('send')}</button></div></form></div></section>`;
+}
+function profilePage(c,world){const refs=w().references.filter(r=>r.worldId===world.id);return `<section class="page-scroll"><div class="page-content"><span class="eyebrow">CHARACTER / WORLD</span><h1>讓每個人，有自己的位置。</h1><p class="page-intro">角色設定可以沿用，世界的記憶各自保存。這裡的欄位都可以改。</p><div class="profile-grid"><div class="card"><div class="card-heading"><h2>角色資料</h2><span class="tag">跨這個角色的世界共用</span></div><form id="character-form"><div class="avatar-editor">${avatar(c,'large')}<div><label class="button secondary upload-label">${icon('upload')}更換頭像<input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" hidden></label><small>PNG / JPG / WebP，1.5 MB 以內</small></div></div><label class="field">名字<input name="name" value="${esc(c.name)}" required maxlength="60"></label><label class="field">一句介紹<input name="description" value="${esc(c.description)}" maxlength="200"></label><label class="field">人設與回應方式<textarea name="persona" rows="8" maxlength="200000">${esc(c.persona)}</textarea><small>起始範本不是完整記憶。可以貼入妳自己的角色設定。</small></label><button class="button primary" type="submit">${icon('check')}儲存角色資料</button></form><div class="card-footer"><button class="text-button" data-action="duplicate-character">${icon('copy')}複製角色設定</button><button class="text-button danger" data-action="delete-character">刪除角色</button></div></div>
+ <div><div class="card"><div class="card-heading"><h2>世界 / IF 線</h2><button class="text-button" data-action="new-world">${icon('plus')}新增</button></div><div class="world-list">${w().worlds.filter(x=>x.characterId===c.id).map(x=>`<button class="world-item ${x.id===world.id?'active':''}" data-world="${x.id}"><span class="world-symbol">${icon('moon')}</span><div>${esc(x.name)}<small>${w().threads.filter(t=>t.worldId===x.id).length} 段對話 · 獨立記憶</small></div>${x.id===world.id?icon('check'):icon('chevron')}</button>`).join('')}</div><div class="button-row"><button class="button secondary" data-action="edit-world">${icon('edit')}編輯「${esc(world.name)}」</button><button class="button secondary" data-action="export-world-story">${icon('download')}匯出這個世界劇情</button></div></div>
+ <div class="card reference-card"><div class="card-heading"><h2>參考資料</h2><span class="tag">只給 ${esc(world.name)}</span></div><p>純文字與 Markdown，保留原文。不會自動讀取其他世界的檔案。</p><div class="reference-list">${refs.map(r=>`<div class="reference-item">${icon('file')}<button class="reference-name" data-reference="${r.id}">${esc(r.name)}<small>${r.content.length.toLocaleString()} 字</small></button><button class="icon-btn" data-remove-reference="${r.id}" aria-label="刪除 ${esc(r.name)}">${icon('trash')}</button></div>`).join('')||'<div class="soft-empty">還沒有參考資料</div>'}</div><label class="button secondary full upload-label">${icon('plus')}一次加入 TXT / MD<input type="file" id="reference-file" accept=".txt,.md,text/plain,text/markdown" multiple hidden></label><small class="hint">可多選（Ctrl／Shift）；每份 1 MB、250,000 字以內。只在本機保存。</small></div></div></div></div></section>`;}
+function settingsPage(){const catalog=providerCatalog(),model=modelSettings(),provider=catalog.find(p=>p.id===model.provider)||catalog[0],models=provider?.models||[{id:model.model,label:model.model}],knownModel=models.some(x=>x.id===model.model),customModel=knownModel?'':model.model;return `<section class="page-scroll"><div class="page-content settings-content"><span class="eyebrow">SETTINGS / KEEP A COPY</span><h1>把這個房間，照顧好。</h1><p class="page-intro">聊天存在這台裝置。想用 Gemini 真正回覆，可以在下方加入自己的 API 金鑰。</p><div class="card"><div class="card-heading"><h2>妳的偏好</h2></div><form id="settings-form" class="settings-form"><label class="field">聊天中的稱呼<input name="playerName" maxlength="60" value="${esc(w().settings.playerName)}" placeholder="妳"></label><label class="field">閱讀字級<select name="fontSize">${[15,16,18,20].map(n=>`<option value="${n}" ${w().settings.fontSize===n?'selected':''}>${n}px</option>`).join('')}</select></label><button class="button primary" type="submit">儲存偏好</button></form></div>
+ <div class="card"><div class="card-heading"><h2>Gemini 金鑰</h2><span class="tag">${MoonlitWeb.hasKey()?'已設定':'尚未設定'}</span></div><form id="gemini-key-form"><label class="field">Gemini API 金鑰<input name="key" required type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="200"></label><label class="checkbox"><input name="remember" type="checkbox">在這台裝置記住金鑰</label><p class="hint">若未勾選，重新開啟網頁可能需要再次輸入。金鑰只供這個瀏覽器連線 Google，且不會放進聊天備份。</p><div class="button-row"><button class="button primary" type="submit">儲存金鑰</button>${MoonlitWeb.hasKey()?'<button type="button" class="button secondary" data-action="clear-gemini-key">清除金鑰</button>':''}</div></form></div>
+ <div class="card"><div class="card-heading"><h2>模型連線</h2><span class="tag">Mock / Gemini</span></div><form id="model-settings-form" class="settings-form"><label class="field">Provider<select id="provider-select" name="provider">${catalog.map(p=>`<option value="${esc(p.id)}" ${p.id===model.provider?'selected':''}>${esc(p.label)}</option>`).join('')}</select></label><label class="field">模型<select id="model-select" name="model">${models.map(x=>`<option value="${esc(x.id)}" ${x.id===model.model?'selected':''}>${esc(x.label)}</option>`).join('')}<option value="__custom__" ${!knownModel?'selected':''}>自訂 model ID…</option></select></label><label class="field">自訂 model ID<input id="custom-model-input" name="customModel" maxlength="120" value="${esc(customModel)}" placeholder="例如：gpt-6.2-sol"><small>只有選「自訂 model ID…」時使用。限英數、-、_、.；請貼服務商官方 model ID。</small></label><label class="field">長聊房回覆上限<select name="maxOutputTokens">${[[80,'一句／很短'],[150,'極短訊息'],[300,'LINE／自然短聊'],[600,'日常聊天'],[1200,'長聊天'],[1800,'標準長文'],[2500,'劇情'],[3000,'長篇劇情'],[4000,'超長']].map(([n,label])=>`<option value="${n}" ${model.maxOutputTokens===n?'selected':''}>${n} tokens · ${label}</option>`).join('')}</select></label><label class="field">最近對話帶入數<select name="contextMessages">${[10,20,30,50].map(n=>`<option value="${n}" ${model.contextMessages===n?'selected':''}>${n} 則</option>`).join('')}</select></label><label class="field">暫時錯誤重試<select name="retryCount">${[0,1,2].map(n=>`<option value="${n}" ${model.retryCount===n?'selected':''}>${n===0?'不自動重試':n+' 次'}</option>`).join('')}</select></label><button class="button primary" type="submit">儲存模型設定</button></form><div class="provider-row"><span class="provider-symbol">${icon('moon')}</span><div><strong>${esc(provider?.label||model.provider)}</strong><p>${esc(provider?.description||'目前沒有載入這個 Provider。')}</p></div><span class="connected">${provider?.external?'外部服務':'本機測試'}</span></div><p class="hint">外部 Provider 只會把目前角色、目前世界、該世界參考資料與最近 N 則訊息送到妳選擇的服務商。手機房會使用該房自己的短回覆上限（預設 300 tokens），長聊房則使用上方設定。金鑰不包含在工作區和備份。</p></div>
+ <div class="card"><div class="card-heading"><h2>完整備份</h2><span class="tag">聊天室資料</span></div><p>包含全部角色的聊天、人設、世界／IF 記憶、參考資料與模型偏好。故事館已獨立保存，不會混進這份備份。匯入會取代目前整份聊天室資料。</p><div class="button-row"><button class="button primary" data-action="export-backup">${icon('download')}匯出整包備份</button><label class="button secondary upload-label">${icon('upload')}還原備份<input id="backup-file" type="file" accept=".json,application/json" hidden></label></div><div class="notice">瀏覽器資料可能被清除，也不會在不同裝置自動同步。請定期把備份檔另存一份。</div></div>
+ <div class="card"><div class="card-heading"><h2>角色資料包</h2><span class="tag">只搬目前角色</span></div><p>預設只帶人設、頭像、世界設定與參考資料。共同記憶和聊天紀錄預設不帶。</p><label class="checkbox"><input id="include-history" type="checkbox">一併帶走這個角色的世界記憶與聊天</label><div class="button-row"><button class="button secondary" data-action="export-character">${icon('download')}匯出角色包</button><button class="button secondary" data-action="export-character-story">${icon('download')}匯出角色全部劇情</button><label class="button secondary upload-label">${icon('upload')}加入角色包<input id="package-file" type="file" accept=".json,application/json" hidden></label></div><small class="hint">參考資料會隨設定匯出；若裡面有私人經歷，請自行檢查。匯入角色包會新增角色，不會覆蓋現有角色。</small></div>
+ <div class="storage-footer">${icon('shield')}<div><strong>${esc(repo.name)}</strong><span>${w().characters.length} 位角色 · ${w().worlds.length} 個世界 · ${w().messages.length} 則訊息</span></div><span class="version">WEB</span></div></div></section>`;}
+function bind(){
+ document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{retainDraft();view=b.dataset.view;drawer=false;render();if(view==='chat')markCurrentThreadRead();});
+ document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>action(b.dataset.action));
+ $('#character-select').onchange=e=>selectCharacter(e.target.value);
+ if($('#world-select'))$('#world-select').onchange=e=>selectWorld(e.target.value);
+ $('#thread-search').oninput=e=>{const pos=e.target.selectionStart;search=e.target.value;retainDraft();render();$('#thread-search').focus();$('#thread-search').setSelectionRange(pos,pos);};
+ document.querySelectorAll('[data-thread]').forEach(b=>b.onclick=async()=>{if(await change(d=>{d.selected.threadId=b.dataset.thread;markThreadRead(d,b.dataset.thread);})){view='chat';drawer=false;render();}});
+ document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>selectWorld(b.dataset.world));
+ document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>{$('#message-input').value=b.dataset.prompt;resizeInput();$('#message-input').focus();});
+ for(const button of document.querySelectorAll('[data-quote]')){
+  button.onclick=()=>{
+   if(busy)return;
+   retainDraft();
+   replyDrafts.set(draftKey(),button.dataset.quote);
+   render();
+   $('#message-input').focus();
+  };
+ }
+ if($('#clear-quote'))$('#clear-quote').onclick=()=>{
+  if(busy)return;
+  retainDraft();
+  replyDrafts.delete(draftKey());
+  render();
+  $('#message-input').focus();
+ };
+ if($('#compose-form')){$('#compose-form').onsubmit=send;$('#message-input').oninput=()=>{drafts.set(draftKey(),$('#message-input').value);resizeInput();};$('#message-input').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();send(e);}};}
+ if($('#character-form')){$('#character-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),cid=scope().character.id;await change(d=>Object.assign(d.characters.find(c=>c.id===cid),{name:String(f.get('name')).trim(),description:String(f.get('description')),persona:String(f.get('persona'))}),'角色資料已儲存');};$('#avatar-file').onchange=uploadAvatar;$('#reference-file').onchange=uploadReference;}
+ document.querySelectorAll('[data-reference]').forEach(b=>b.onclick=()=>{const r=w().references.find(r=>r.id===b.dataset.reference);modal('參考資料 · '+r.name,`<pre class="context-text">${esc(r.content)}</pre>`,{label:'關閉'});});
+ document.querySelectorAll('[data-remove-reference]').forEach(b=>b.onclick=async()=>{const r=w().references.find(r=>r.id===b.dataset.removeReference);if(await confirmDialog('移除參考資料？',`只移除「${esc(r.name)}」，不會刪除原始檔案。`,'移除'))await change(d=>{d.references=d.references.filter(x=>x.id!==r.id);},'參考資料已移除');});
+ if($('#gemini-key-form')){
+  $('#gemini-key-form').onsubmit=async event=>{
+   event.preventDefault();
+   const form=new FormData(event.target);
+   try{
+    MoonlitWeb.saveKey(String(form.get('key')).trim(),form.has('remember'));
+    if(modelSettings().provider!=='gemini'){
+     await change(d=>{d.settings.model={...d.settings.model,provider:'gemini',model:MoonlitWeb.defaultModel};},'Gemini 金鑰已儲存。');
+    }else{render();toast('Gemini 金鑰已儲存。');}
+   }catch(error){toast(error.message,true);}
+  };
+ }
+ if($('#settings-form')){$('#settings-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);await change(d=>{d.settings.playerName=String(f.get('playerName')).trim()||'妳';d.settings.fontSize=Number(f.get('fontSize'));},'偏好已儲存');};$('#backup-file').onchange=importBackup;$('#package-file').onchange=importPackage;}
+ if($('#model-settings-form')){const providerSelect=$('#provider-select'),modelSelect=$('#model-select'),customInput=$('#custom-model-input');providerSelect.onchange=()=>{const p=providerCatalog().find(x=>x.id===providerSelect.value),models=p?.models||[];modelSelect.innerHTML=models.map((x,i)=>`<option value="${esc(x.id)}" ${i===0?'selected':''}>${esc(x.label)}</option>`).join('')+'<option value="__custom__">自訂 model ID…</option>';customInput.value='';};$('#model-settings-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),selected=String(f.get('model')),custom=String(f.get('customModel')||'').trim(),chosen=selected==='__custom__'?custom:selected;if(!/^[-a-zA-Z0-9_.]{1,120}$/.test(chosen))throw toast('自訂 model ID 格式不正確。請只使用英數、-、_、.。',true);await change(d=>{d.settings.model=C.normalizeModelSettings({provider:String(f.get('provider')),model:chosen,contextMessages:Number(f.get('contextMessages')),retryCount:Number(f.get('retryCount')),maxOutputTokens:Number(f.get('maxOutputTokens'))});},'模型接線設定已儲存');};}
+}
+async function selectCharacter(cid){if(await change(d=>{const world=d.worlds.find(x=>x.characterId===cid);d.selected={characterId:cid,worldId:world.id,threadId:d.threads.filter(t=>t.worldId===world.id).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0]?.id||null};})){search='';drawer=false;render();markCurrentThreadRead();}}
+async function selectWorld(wid){if(await change(d=>{const world=d.worlds.find(x=>x.id===wid);d.selected={characterId:world.characterId,worldId:wid,threadId:d.threads.filter(t=>t.worldId===wid).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0]?.id||null};})){search='';drawer=false;render();markCurrentThreadRead();}}
+function markThreadRead(workspace,threadId){
+ const thread=workspace.threads.find(t=>t.id===threadId);
+ if(thread)delete thread.unread;
+ for(const message of workspace.messages){
+  if(message.threadId===threadId&&message.unread===true)delete message.unread;
+ }
+}
+function markCurrentThreadRead(){
+ const threadId=w().selected.threadId;
+ if(view==='chat'&&(scope().thread?.unread===true||w().messages.some(m=>m.threadId===threadId&&m.unread===true))){
+  return change(d=>markThreadRead(d,threadId));
+ }
+}
+function resizeInput(){const t=$('#message-input');if(t){t.style.height='auto';t.style.height=Math.min(t.scrollHeight,160)+'px';}}
+function scrollMessages(){requestAnimationFrame(()=>{const e=$('#messages');if(e)e.scrollTop=e.scrollHeight;});}
+function showPending(content){
+ const {character}=scope(),model=modelSettings(),provider=providerCatalog().find(p=>p.id===model.provider),column=$('#messages .message-column');
+ if(!column)return;
+ if(column.querySelector('.welcome'))column.innerHTML='';
+ const now=new Date().toISOString();
+ column.insertAdjacentHTML('beforeend',`<article class="message user pending-local"><div class="message-inner"><div class="message-meta"><span>${esc(w().settings.playerName||'妳')}</span><time>${date(now)}</time></div><div class="bubble">${esc(content)}</div></div></article><article class="message assistant pending-local pending-reply">${avatar(character,'message-avatar')}<div class="message-inner"><div class="message-meta"><span>${esc(character.name)}</span><time>傳送中</time></div><div class="bubble"><span class="pending-dot"></span>${esc(provider?.label||model.provider)} 正在回覆…</div></div></article>`);
+ scrollMessages();
+}
+async function send(e){e?.preventDefault();if(busy)return;const input=$('#message-input'),button=$('.send-button');if(!input||!input.value.trim())return;const content=input.value,key=draftKey();sendError='';busy=true;document.body.classList.add('working');showPending(content);input.value='';input.disabled=true;button.type='button';button.disabled=false;button.innerHTML=icon('stop');button.setAttribute('aria-label','停止回覆');button.onclick=()=>service.cancel();try{await service.send(content,{modelOverride:modelSettings(),replyTo:replyDrafts.get(key)});drafts.delete(key);replyDrafts.delete(key);}catch(err){if(err?.code==='cancelled'){sendError='';toast('已停止這次回覆。');}else{sendError=err.message||'模型回覆失敗。';toast(sendError,true);}}finally{busy=false;document.body.classList.remove('working');render();$('#message-input')?.focus();}}
+function modal(title,body,{label='儲存',submit,cancel=true,wide=false,danger=false}={}){
+ const d=$('#modal');if(d.open)d.close('cancel');d.returnValue='cancel';d.oncancel=()=>{d.returnValue='cancel';};d.className=wide?'wide-dialog':'';d.innerHTML=`<form id="modal-form"><div class="dialog-heading"><h2>${esc(title)}</h2><button type="button" class="icon-btn" id="modal-close" aria-label="關閉">${icon('close')}</button></div><div class="dialog-body">${body}</div><div class="dialog-footer">${cancel?'<button class="button secondary" type="button" id="modal-cancel">取消</button>':''}<button class="button ${danger?'danger-solid':'primary'}" type="submit">${esc(label)}</button></div></form>`;
+ const close=()=>d.close('cancel');$('#modal-close').onclick=close;if($('#modal-cancel'))$('#modal-cancel').onclick=close;
+ $('#modal-form').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{if(submit)await submit(new FormData(e.target));d.close('ok');}catch(err){toast(err.message,true);button.disabled=false;}};d.showModal();
+}
+function confirmDialog(title,body,label='確定'){return new Promise(resolve=>{modal(title,`<p>${body}</p>`,{label,submit:()=>{},danger:true});$('#modal').addEventListener('close',()=>resolve($('#modal').returnValue==='ok'),{once:true});});}
+function inputField(label,name,value='',rows){return `<label class="field">${label}${rows?`<textarea name="${name}" rows="${rows}" maxlength="200000">${esc(value)}</textarea>`:`<input name="${name}" value="${esc(value)}" required maxlength="80">`}</label>`;}
+function providerPayloadPreview(){
+ const model=modelSettings(),workspace={...w(),settings:{...w().settings,model}},request=C.context(workspace),base={provider:model.provider,model:model.model,contextMessages:request.request.contextMessages,maxOutputTokens:request.request.maxOutputTokens};
+ if(model.provider==='gemini'&&globalThis.MoonlitGemini?.buildGeminiRequest)return {...base,payload:MoonlitGemini.buildGeminiRequest(request,model.model)};
+ return {...base,payload:request};
+}
+function exportStamp(){return new Date().toLocaleString('zh-TW');}
+function exportDate(value){return date(value,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false})||String(value||'');}
+function sortedThreads(worldId){return w().threads.filter(t=>t.worldId===worldId).sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt))||String(a.updatedAt).localeCompare(String(b.updatedAt)));}
+function messagesForThread(threadId){return w().messages.filter(m=>m.threadId===threadId).sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt)));}
+function messageBlock(m,character,level='###'){return [level+' '+(m.role==='user'?(w().settings.playerName||'妳'):character.name)+' · '+exportDate(m.createdAt),'',m.content,''].join('\n');}
+function threadMarkdown(thread,character,world,{heading=1,includeMeta=true,includeTitle=true}={}){const prefix='#'.repeat(heading),rows=messagesForThread(thread.id),parts=[];if(includeTitle)parts.push(prefix+' '+thread.title,'');if(includeMeta)parts.push('角色：'+character.name,'世界：'+world.name,'房型：'+roomLabel(thread),'');if(!rows.length)parts.push('（這段對話目前沒有訊息。）','');else for(const m of rows)parts.push(messageBlock(m,character,'#'.repeat(Math.min(6,heading+(includeTitle?1:0)))));return parts.join('\n');}
+function threadChapter(thread,character,world,index,total,heading){const rows=messagesForThread(thread.id),prefix='#'.repeat(heading),created=exportDate(thread.createdAt)||'—',updated=exportDate(thread.updatedAt)||created;return [prefix+' 聊天室 '+(index+1)+' / '+total+'｜'+thread.title,'','> 建立：'+created+'　｜　最近更新：'+updated+'　｜　'+roomLabel(thread)+'　｜　'+rows.length+' 則訊息','',threadMarkdown(thread,character,world,{heading:Math.min(6,heading+1),includeMeta:false,includeTitle:false})].join('\n');}
+function worldMarkdown(character,world){const parts=['# '+character.name+'｜'+world.name,'','角色：'+character.name,'世界：'+world.name,'匯出時間：'+exportStamp(),''];const threads=sortedThreads(world.id);if(!threads.length)parts.push('（這個世界目前沒有對話。）','');else threads.forEach((t,i)=>{if(i)parts.push('','---','','## 下一個聊天室','');parts.push(threadChapter(t,character,world,i,threads.length,2),'');});return parts.join('\n');}
+function characterMarkdown(character){const parts=['# '+character.name+'｜全部劇情','','角色：'+character.name,'匯出時間：'+exportStamp(),''];const worlds=w().worlds.filter(x=>x.characterId===character.id);worlds.forEach((world,wi)=>{if(wi)parts.push('','---','','# 下一個世界','');parts.push('## 世界 '+(wi+1)+' / '+worlds.length+'｜'+world.name,'');const threads=sortedThreads(world.id);if(!threads.length){parts.push('（這個世界目前沒有對話。）','');return;}threads.forEach((t,i)=>{if(i)parts.push('','---','','### 下一個聊天室','');parts.push(threadChapter(t,character,world,i,threads.length,3),'');});});return parts.join('\n');}
+async function action(name){if(busy)return;
+ if(name==='clear-gemini-key'){
+  try{MoonlitWeb.saveKey('',false);render();toast('Gemini 金鑰已清除。');}
+  catch(error){toast(error.message,true);}
+  return;
+ }
+ const {character,world,thread}=scope();
+ if(name==='mark-unread'&&thread){
+  await change(d=>{d.threads.find(t=>t.id===thread.id).unread=true;},'已標為未讀。');
+  return;
+ }
+ if(name==='open-drawer'||name==='close-drawer'){retainDraft();drawer=name==='open-drawer';render();return;}
+ if(name==='new-thread')modal('新增一個房間',inputField('房間名稱','title','新的對話')+`<label class="field">房型<select name="roomType"><option value="room">長聊房 · 沿用模型回覆上限</option><option value="phone">手機房 · 預設 300 tokens</option></select></label><p class="hint">兩種房型共用目前角色、世界與參考資料；只有聊天介面與單次回覆節奏不同。</p>`,{label:'蓋房間',submit:async f=>{const type=String(f.get('roomType'))==='phone'?'phone':'room';if(!await change(d=>{const t={id:C.id(),worldId:world.id,title:String(f.get('title')).trim()||'新的對話',roomType:type,maxOutputTokens:type==='phone'?300:null,createdAt:C.now(),updatedAt:C.now()};d.threads.push(t);d.selected.threadId=t.id;}))throw Error('建立失敗');view='chat';drawer=false;render();$('#message-input')?.focus();}});
+ if(name==='rename-thread')modal('重新命名對話',inputField('對話名稱','title',thread.title),{submit:async f=>{if(!await change(d=>{d.threads.find(t=>t.id===thread.id).title=String(f.get('title')).trim();},'名稱已更新'))throw Error('沒有儲存成功，請稍後再試。');}});
+ if(name==='room-settings'){const current=roomType(thread),currentTokens=roomTokens(thread);modal('房間設定 · '+thread.title,`<label class="field">房型<select name="roomType"><option value="room" ${current==='room'?'selected':''}>長聊房</option><option value="phone" ${current==='phone'?'selected':''}>手機房</option></select></label><label class="field">這間房的回覆上限<select name="maxOutputTokens"><option value="inherit" ${thread.maxOutputTokens===null?'selected':''}>沿用全域設定（${modelSettings().maxOutputTokens} tokens）</option>${[[80,'一句／很短'],[150,'極短訊息'],[300,'LINE／自然短聊'],[600,'日常聊天'],[1200,'長聊天'],[1800,'標準長文'],[2500,'劇情'],[3000,'長篇劇情'],[4000,'超長']].map(([n,label])=>`<option value="${n}" ${thread.maxOutputTokens===n?'selected':''}>${n} · ${label}</option>`).join('')}</select></label><p class="hint">手機房新建時預設 300；之後可以在這裡自己調。150 仍保留給刻意要極短訊息的房間。切房型不會搬走或刪除原本訊息。</p>`,{submit:async f=>{const type=String(f.get('roomType'))==='phone'?'phone':'room',raw=String(f.get('maxOutputTokens')),cap=raw==='inherit'?null:Number(raw);if(!await change(d=>{const t=d.threads.find(x=>x.id===thread.id);t.roomType=type;t.maxOutputTokens=Number.isInteger(cap)?cap:null;},'房間設定已更新'))throw Error('房間設定沒有存好。');}});}
+ if(name==='delete-thread'&&await confirmDialog('刪除這段對話？','「'+esc(thread.title)+'」和其中的訊息將從本機移除。若想保留，請先匯出完整備份。','刪除對話'))await change(d=>{C.deleteThread(d,thread.id);},'對話已刪除');
+ if(name==='new-character')modal('新的相遇',inputField('角色名字','name')+inputField('起始世界','world','日常')+'<p class="hint">建立後可以補上人設、頭像與參考資料。新角色不會帶入其他人的聊天記憶。</p>',{label:'建立角色',submit:async f=>{if(!await change(d=>{const cid=C.id(),wid=C.id();d.characters.push({id:cid,name:String(f.get('name')).trim(),description:'',persona:'',avatar:''});d.worlds.push({id:wid,characterId:cid,name:String(f.get('world')).trim(),instructions:'',memory:''});d.selected={characterId:cid,worldId:wid,threadId:null};},'角色已建立'))throw Error('建立失敗');view='profile';search='';drawer=false;render();}});
+ if(name==='duplicate-character'){const p=C.characterPackage(w(),character.id,false);p.character.name=(p.character.name+' · 副本').slice(0,60);await change(d=>Object.assign(d,C.addPackage(d,p)),'已複製設定；沒有帶入聊天或世界記憶');}
+ if(name==='delete-character'){if(w().characters.length===1){toast('至少要留一個角色。',true);return;}if(await confirmDialog('刪除「'+character.name+'」？','這個角色的所有世界、參考資料、記憶與聊天都會刪除。請先匯出備份。','刪除角色'))await change(d=>{const worlds=new Set(d.worlds.filter(x=>x.characterId===character.id).map(x=>x.id)),threads=new Set(d.threads.filter(t=>worlds.has(t.worldId)).map(t=>t.id));d.characters=d.characters.filter(c=>c.id!==character.id);d.worlds=d.worlds.filter(x=>!worlds.has(x.id));d.threads=d.threads.filter(t=>!threads.has(t.id));d.messages=d.messages.filter(m=>!threads.has(m.threadId));d.references=d.references.filter(r=>!worlds.has(r.worldId));const c=d.characters[0],x=d.worlds.find(x=>x.characterId===c.id);d.selected={characterId:c.id,worldId:x.id,threadId:d.threads.find(t=>t.worldId===x.id)?.id||null};},'角色已刪除');}
+ if(name==='new-world')modal('另一個世界',inputField('世界 / IF 線名稱','name')+inputField('這個世界的設定','instructions','',5),{label:'建立世界',submit:async f=>{if(!await change(d=>{const id=C.id();d.worlds.push({id,characterId:character.id,name:String(f.get('name')).trim(),instructions:String(f.get('instructions')),memory:''});d.selected={characterId:character.id,worldId:id,threadId:null};},'世界已建立，記憶從空白開始'))throw Error('建立失敗');search='';render();}});
+ if(name==='edit-world')modal('編輯世界 · '+world.name,inputField('名稱','name',world.name)+inputField('世界設定','instructions',world.instructions,5)+inputField('手動記憶筆記','memory',world.memory,6)+'<p class="hint">只有這個世界會讀到這份記憶。這版不會自動整理或生成長期記憶。</p>',{submit:async f=>{if(!await change(d=>Object.assign(d.worlds.find(x=>x.id===world.id),{name:String(f.get('name')).trim(),instructions:String(f.get('instructions')),memory:String(f.get('memory'))}),'世界設定已儲存'))throw Error('儲存失敗');}});
+ if(name==='context'){const preview=providerPayloadPreview();modal('本次實際送出的模型資料',`<div class="notice">目前 Provider：${esc(preview.provider)} / ${esc(preview.model)}。下方已套用該 Provider 的實際字數預算與截斷規則；也就是送出時真正形成的 payload（不含 API key）。目前最多帶入最近 ${preview.contextMessages} 則訊息；這間房的單次回覆上限 ${preview.maxOutputTokens} tokens。</div><pre class="context-text">${esc(JSON.stringify(preview.payload,null,2))}</pre>`,{label:'看好了',cancel:false,wide:true});}
+ if(name==='export-thread'&&thread){const text=['# '+thread.title,'','角色：'+character.name,'世界：'+world.name,'匯出時間：'+exportStamp(),'','---','',threadMarkdown(thread,character,world,{heading:2,includeMeta:false})].join('\n');await exportText('moonlit-thread-'+safeFilePart(character.name)+'-'+safeFilePart(world.name)+'-'+safeFilePart(thread.title)+'.md',text);}
+ if(name==='export-world-story'){await exportText('moonlit-world-'+safeFilePart(character.name)+'-'+safeFilePart(world.name)+'.md',worldMarkdown(character,world));}
+ if(name==='export-character-story'){await exportText('moonlit-character-story-'+safeFilePart(character.name)+'.md',characterMarkdown(character));}
+ if(name==='export-backup'){try{await exportJSON('moonlit-chat-backup',C.backup(w()));}catch(e){toast(e.message,true);}}
+ if(name==='export-character')await exportJSON('moonlit-character',C.characterPackage(w(),character.id,$('#include-history').checked));
+}
+function safeFilePart(value){return String(value||'chat').normalize('NFKC').replace(/[\\/:*?"<>|\x00-\x1F]/g,'-').replace(/\s+/g,' ').trim().slice(0,40)||'chat';}
+async function exportText(name,body){try{if(new TextEncoder().encode(body).byteLength>30000000)throw Error('匯出文字超過 30 MB。');if(globalThis.__TAURI__?.core?.invoke){const path=await __TAURI__.core.invoke('save_text_export',{name,body});toast('已存到：'+path);}else{const url=URL.createObjectURL(new Blob([body],{type:'text/markdown;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);toast('劇情匯出已開始。');}return true;}catch(e){toast(e.message,true);return false;}}
+async function readJSON(file){if(!file)throw Error('沒有選擇檔案。');if(file.size>30000000)throw Error('本版單一匯入檔上限 30 MB。');try{return JSON.parse(await file.text());}catch{throw Error('檔案不是有效的 JSON。');}}
+async function exportJSON(prefix,data,exactName=null,raise=false){try{const body=JSON.stringify(data),name=exactName||prefix+'-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.json';if(new TextEncoder().encode(body).byteLength>30000000)throw Error('本版單一備份檔上限 30 MB。');if(globalThis.__TAURI__?.core?.invoke){const path=await __TAURI__.core.invoke('save_export',{name,body});toast('已存到：'+path);}else{const url=URL.createObjectURL(new Blob([body],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);toast('備份下載已開始，請確認瀏覽器的下載項目。');}return true;}catch(e){toast(e.message,true);if(raise)throw e;return false;}}
+async function importBackup(e){const file=e.target.files[0];e.target.value='';if(!file)return;try{const source=await readJSON(file),next=C.readBackup(source);if(!await confirmDialog('還原聊天室備份？',`會還原 ${next.characters.length} 位角色、${next.worlds.length} 個世界、${next.messages.length} 則訊息。${source.format==='moonlit-home-backup'?'這是舊版月光小屋整包備份；其中故事館資料會忽略。':''}建議先匯出目前的聊天室備份。`,'取代並還原'))return;if(await change(d=>{for(const k of Object.keys(d))delete d[k];Object.assign(d,next);},'聊天室備份已還原')){drafts.clear();replyDrafts.clear();search='';view='chat';render();}}catch(err){toast(err.message,true);}}
+async function importPackage(e){const file=e.target.files[0];e.target.value='';if(!file)return;try{const p=await readJSON(file);const checked=C.addPackage(C.copy(w()),p),c=checked.characters.at(-1);if(!await confirmDialog('加入角色包？',`新增「${esc(c.name)}」。這份資料包含 ${p.worlds.length} 個世界、${p.messages.length} 則訊息。現有角色會保留。`,'加入角色'))return;if(await change(d=>Object.assign(d,C.addPackage(d,p)),'角色包已加入')){search='';view='profile';render();}}catch(err){toast(err.message,true);}}
+async function uploadAvatar(e){const f=e.target.files[0];if(!f)return;try{if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>1500000)throw Error('請使用 1.5 MB 內的 PNG、JPG 或 WebP 圖片。');const value=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('無法讀取圖片'));r.readAsDataURL(f);});const cid=scope().character.id;await change(d=>{d.characters.find(c=>c.id===cid).avatar=value;},'頭像已儲存');}catch(err){toast(err.message,true);}}
+async function uploadReference(e){
+ const files=Array.from(e.target.files);e.target.value='';if(!files.length)return;
+ if(busy){toast('正在儲存，請稍後再加入參考資料。',true);return;}
+ const {world}=scope(),wid=world.id,worldName=world.name;
+ busy=true;document.body.classList.add('working');
+ try{
+  if(files.length+w().references.length>1000)throw Error('參考資料總數上限 1,000 份；這批尚未加入。');
+  for(const f of files)if(!/\.(txt|md)$/i.test(f.name)||f.size>1000000)throw Error('「'+f.name+'」不符合限制：請使用 1 MB 內的 TXT 或 MD。這批尚未加入。');
+  if(files.reduce((sum,f)=>sum+f.size,0)>20000000)throw Error('這批檔案合計超過 20 MB，請減少檔案後重試。這批尚未加入。');
+  const references=await Promise.all(files.map(async f=>{const content=await f.text();if(content.length>250000)throw Error('「'+f.name+'」超過每份 250,000 字的上限。這批尚未加入。');return {id:C.id(),worldId:wid,name:f.name.slice(0,200),content};}));
+  await service.change(d=>{if(!d.worlds.some(x=>x.id===wid))throw Error('原本選擇的世界已不存在，這批尚未加入。');d.references.push(...references);});
+  toast('已一次加入 '+references.length+' 份參考資料至「'+worldName+'」。');
+ }catch(err){toast(err.message||'讀取失敗，這批尚未加入。',true);}
+ finally{busy=false;document.body.classList.remove('working');render();}
+}
+async function init(){try{repo=await ChatStorage.open();let data=await repo.load();if(!data){data=C.seed();await repo.save(data);}else{data=C.validate(data);}service=new C.WorkspaceService(repo,data);render();}catch(e){$('#app').innerHTML=`<main class="fatal"><span class="brand-icon">${icon('moon')}</span><h1>本機資料暫時無法開啟</h1><p>${esc(e.message)}</p><p>請確認 Safari 允許網站儲存，再重新整理。</p><button class="button primary" onclick="location.reload()">重新整理</button></main>`;}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer){drawer=false;render();}});
+init();
+})();
+</script></body></html>
