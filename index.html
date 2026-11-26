@@ -241,11 +241,15 @@ body.story-open .topbar{height:48px;padding-top:0;padding-bottom:0}
 input[type=date]{display:block;min-width:0;max-width:100%;width:100%;appearance:none;-webkit-appearance:none}
 input[type=date]::-webkit-date-and-time-value{min-width:0;text-align:left}
 
+.diary-entry summary{cursor:pointer;display:block}.diary-entry summary::after{content:' 閱讀全文 ▾';font-size:.85em;color:var(--green)}.diary-entry[open] summary::after{content:' 收合 ▴'}.diary-preview{display:block;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.diary-entry[open] .diary-preview{display:none}.life-card article button{margin:4px 4px 0 0}
+@media(max-width:760px){#app{height:var(--visible-height,100dvh);max-height:var(--visible-height,100dvh)}.im-header,.im-composer-wrap{flex-shrink:0}.im-composer textarea{font-size:16px}body{overflow:hidden}}
+
 @media(max-width:760px){.topbar,.chat-mode .topbar{height:calc(50px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}.chat-mode .composer-wrap{padding-bottom:max(12px,env(safe-area-inset-bottom))}}</style></head>
 <body><div id="app"><div class="boot">正在開啟小倉庫…</div></div><dialog id="modal" aria-label="操作視窗"></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>(function(root){
 'use strict';
 const copy=x=>structuredClone(x),id=()=>globalThis.crypto?.randomUUID?.()||'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),now=()=>new Date().toISOString();
+const PROACTIVE_RULE='以手機私訊方式主動聯絡，不描寫動作、環境、神態或內心，不用小說旁白或對話引號。自然延續近期話題、當前時間及獲授權的生活紀錄；可分享日常、關心、撒嬌或開新話題。每次 1～3 則短訊息，以 || 分隔，不重複提醒。';
 const DEFAULT_MODEL_SETTINGS=Object.freeze({provider:'mock',model:'mock-fixed',contextMessages:20,retryCount:0,maxOutputTokens:300});
 function normalizeOutputLimit(n){return Number.isInteger(n)&&n>=16?(n<=150?150:n<=300?300:600):300;}
 function normalizeModelSettings(value){const v=value&&typeof value==='object'?value:{};const contextMessages=Number(v.contextMessages),retryCount=Number(v.retryCount),maxOutputTokens=Number(v.maxOutputTokens);return {provider:typeof v.provider==='string'&&/^[a-z0-9._-]{1,60}$/i.test(v.provider)?v.provider:DEFAULT_MODEL_SETTINGS.provider,model:typeof v.model==='string'&&v.model.length<=120&&v.model.trim()?v.model.trim():DEFAULT_MODEL_SETTINGS.model,contextMessages:Number.isInteger(contextMessages)&&contextMessages>=1&&contextMessages<=50?contextMessages:DEFAULT_MODEL_SETTINGS.contextMessages,retryCount:Number.isInteger(retryCount)&&retryCount>=0&&retryCount<=2?retryCount:DEFAULT_MODEL_SETTINGS.retryCount,maxOutputTokens:normalizeOutputLimit(maxOutputTokens)};}
@@ -266,7 +270,7 @@ function validate(input){
   if(!['photo','sticker','gift'].includes(message.kind))delete message.kind;
   if(typeof message.readAt!=='string'||!Number.isFinite(Date.parse(message.readAt)))delete message.readAt;
  }
- for(const character of w.characters)if(!['fast','steady','slow'].includes(character.pace))character.pace='steady';
+ for(const character of w.characters){if(!['fast','steady','slow'].includes(character.pace))character.pace='steady';character.proactiveRules=text(character.proactiveRules,8000)?character.proactiveRules:PROACTIVE_RULE;}
  const messageIndex=new Map(w.messages.map(m=>[m.id,m]));
  for(const m of w.messages){
   const quoted=messageIndex.get(m.replyTo);
@@ -301,7 +305,7 @@ function contextMessages(w,threadId,limit){
   return {role:m.role,content,image:m.image,kind:m.kind};
  });
 }
-function context(w,options={}){const {character,world,thread}=scope(w),model=normalizeModelSettings(w.settings?.model),limit=Number.isInteger(options.messageLimit)?Math.max(1,Math.min(50,options.messageLimit)):model.contextMessages,effectiveMax=Number.isInteger(thread?.maxOutputTokens)?normalizeOutputLimit(thread.maxOutputTokens):model.maxOutputTokens;return {lifeSummary:globalThis.LittleLife?.summary(w,world)||'',character:{id:character.id,name:character.name,persona:character.persona},playerName:w.settings.playerName==='妳'?'':w.settings.playerName,world:{id:world.id,name:world.name,instructions:world.instructions,memory:world.memory},room:{type:'phone',maxOutputTokens:effectiveMax},references:w.references.filter(r=>r.worldId===world.id).map(r=>({name:r.name,content:r.content})),messages:thread?contextMessages(w,thread.id,limit):[],request:{provider:model.provider,model:model.model,contextMessages:limit,maxOutputTokens:effectiveMax}};}
+function context(w,options={}){const {character,world,thread}=scope(w),model=normalizeModelSettings(w.settings?.model),limit=Number.isInteger(options.messageLimit)?Math.max(1,Math.min(50,options.messageLimit)):model.contextMessages,effectiveMax=Number.isInteger(thread?.maxOutputTokens)?normalizeOutputLimit(thread.maxOutputTokens):model.maxOutputTokens;return {lifeSummary:globalThis.LittleLife?.summary(w,world)||'',character:{id:character.id,name:character.name,persona:character.persona,proactiveRules:character.proactiveRules},playerName:w.settings.playerName==='妳'?'':w.settings.playerName,world:{id:world.id,name:world.name,instructions:world.instructions,memory:world.memory},room:{type:'phone',maxOutputTokens:effectiveMax},references:w.references.filter(r=>r.worldId===world.id).map(r=>({name:r.name,content:r.content})),messages:thread?contextMessages(w,thread.id,limit):[],request:{provider:model.provider,model:model.model,contextMessages:limit,maxOutputTokens:effectiveMax}};}
 function backup(w){return {format:'moonlit-chat-backup',version:1,exportedAt:now(),workspace:validate(w)};}
 function readBackup(v){if(!['moonlit-chat-backup','moonlit-home-backup'].includes(v?.format)||v.version!==1)throw Error('請選擇月光聊天室備份；舊版月光小屋整包備份也可匯入，故事館資料會自動忽略。');return validate(v.workspace);}
 function characterPackage(w,characterId,history=false){const character=w.characters.find(c=>c.id===characterId);if(!character)throw Error('找不到角色。');const worlds=w.worlds.filter(x=>x.characterId===characterId).map(x=>({...x,memory:history?x.memory:''}));const threads=history?w.threads.filter(t=>worlds.some(x=>x.id===t.worldId)):[];return {format:'moonlit-character',version:1,includesHistory:history,character:copy(character),worlds:copy(worlds),threads:copy(threads),messages:history?copy(w.messages.filter(m=>threads.some(t=>t.id===m.threadId))):[],references:copy(w.references.filter(r=>worlds.some(x=>x.id===r.worldId)))};}
@@ -332,14 +336,14 @@ class WorkspaceService{
  change(mutate){const job=this.tail.then(async()=>{const next=copy(this.workspace);await mutate(next);const valid=validate(next);await this.repository.save(valid);this.workspace=valid;return valid;});this.tail=job.catch(()=>{});return job;}
  replace(w){const next=validate(w);return this.change(draft=>{for(const k of Object.keys(draft))delete draft[k];Object.assign(draft,next);});}
  cancel(){if(this.activeController&&!this.activeController.signal.aborted){this.activeController.abort();return true;}return false;}
- async send(content,{onDelta,modelOverride,replyTo,proactive=false,image,kind}={}){
+ async send(content,{onDelta,onCommitted,modelOverride,replyTo,proactive=false,image,kind}={}){
   if((!proactive&&!content.trim())||content.length>32000)throw Error('請輸入 1–32,000 個字。');
   if(this.activeController)throw Error('上一則回覆仍在處理中。');
   const controller=new AbortController();this.activeController=controller;
   const guardedDelta=value=>{if(!controller.signal.aborted)onDelta?.(value);};
-  try{return await this.change(async w=>{
+  try{let targetId,messageId,request,model,provider,pace;await this.change(w=>{
    let {world,thread}=scope(w);
-   if(!thread){thread={id:id(),worldId:world.id,title:content.trim().slice(0,24),roomType:'phone',maxOutputTokens:null,createdAt:now(),updatedAt:now()};w.threads.push(thread);w.selected.threadId=thread.id;}
+   if(!thread){thread={id:id(),worldId:world.id,title:content.trim().slice(0,24)||'新的對話',roomType:'phone',maxOutputTokens:null,createdAt:now(),updatedAt:now()};w.threads.push(thread);w.selected.threadId=thread.id;}
    const first=!w.messages.some(m=>m.threadId===thread.id);
    const message={id:id(),threadId:thread.id,role:'user',content:content.trim(),createdAt:now(),mock:false};
    if(w.messages.some(m=>m.id===replyTo&&m.threadId===thread.id))message.replyTo=replyTo;
@@ -351,31 +355,38 @@ class WorkspaceService{
    if(validImage(image))message.image=image;
    if(!proactive)w.messages.push(message);
    if(first&&!proactive)thread.title=content.trim().slice(0,24);
-   const model=normalizeModelSettings(modelOverride??w.settings.model),provider=providers.get(model.provider);
+   model=normalizeModelSettings(modelOverride??w.settings.model);provider=providers.get(model.provider);
    if(!provider)throw new ProviderError('目前沒有安裝「'+model.provider+'」Provider。',{code:'provider_missing'});
    if(provider.id==='mock'&&provider.models.length&&!provider.models.some(x=>x.id===model.model))throw new ProviderError('目前 Provider 不支援「'+model.model+'」模型。',{code:'model_missing'});
-   const request=context({...w,settings:{...w.settings,model}});
+   request=context({...w,settings:{...w.settings,model}});
    request.proactive=proactive;
    const today=globalThis.LittleLife?.localDate();
    const events=w.life?.events.filter(row=>row.worldId===world.id&&(row.date===today||row.annual===true&&typeof row.date==='string'&&row.date.slice(5)===today.slice(5)))??[];
    if(events.length)request.world.instructions+='\n【今天的行程】\n'+events.map(row=>row.text).join('、');
-   if(proactive)request.messages.push({role:'user',content:'請以角色身分主動傳一則新訊息給我。這是私下指令，請直接發訊息。'});
+   if(proactive)request.messages.push({role:'user',content:'請以角色身分主動傳新手機私訊。只輸出實際傳出的文字，不要小說旁白、動作、引號或場景描寫。'});
+   targetId=thread.id;messageId=message.id;pace=scope(w).character.pace;thread.updatedAt=now();
+  });
+   onCommitted?.();
+   if(controller.signal.aborted)throw abortError();
    const rawAnswer=await generateWithRetry(provider,request,{signal:controller.signal,model:model.model,retryCount:model.retryCount,onDelta:guardedDelta});
    if(controller.signal.aborted)throw abortError();
    const answer=normalizeAnswer(rawAnswer,provider);
    if(controller.signal.aborted)throw abortError();
    const bubbles=splitReply(answer.content);
    if(!bubbles.length)throw new ProviderError('角色沒有回覆內容。');
-   const pace=scope(w).character.pace;
+
    if(!answer.mock)await wait({fast:0,steady:280,slow:1000}[pace]??280,controller.signal);
-   if(!proactive&&!answer.mock)message.readAt=now();
+   return await this.change(w=>{
+   if(controller.signal.aborted)throw abortError();
+   const thread=w.threads.find(t=>t.id===targetId);if(!thread)throw Error('原聊天室不存在。');
+   const message=w.messages.find(m=>m.id===messageId);if(message&&!answer.mock)message.readAt=now();
    for(const content of bubbles)w.messages.push({...answer,content,id:id(),threadId:thread.id,createdAt:now()});
    thread.updatedAt=now();
    if(controller.signal.aborted)throw abortError();
   });}finally{if(this.activeController===controller)this.activeController=null;}
  }
 }
-const api={id,now,copy,DEFAULT_MODEL_SETTINGS,normalizeModelSettings,seed,validate,scope,context,backup,readBackup,characterPackage,addPackage,deleteThread,ProviderError,MockProvider,providers,registerProvider,providerCatalog,generateWithRetry,WorkspaceService,validImage,gifts,stickers};
+const api={PROACTIVE_RULE,id,now,copy,DEFAULT_MODEL_SETTINGS,normalizeModelSettings,seed,validate,scope,context,backup,readBackup,characterPackage,addPackage,deleteThread,ProviderError,MockProvider,providers,registerProvider,providerCatalog,generateWithRetry,WorkspaceService,validImage,gifts,stickers};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ChatCore=api;
 })(globalThis);
 
@@ -411,9 +422,9 @@ function buildSystem(request){
  if(refs.length){let used=0,omitted=0;const blocks=[];for(const r of refs){const block=`【參考資料：${clean(r.name)||'未命名'}】\n${clean(r.content)}`;if(used+block.length>45000){omitted++;continue;}blocks.push(block);used+=block.length;}if(omitted)blocks.push(`[另有 ${omitted} 份參考資料因本次 API 預算上限未帶入]`);if(blocks.length)parts.push(blocks.join('\n\n'));}
  if(request.lifeMode)parts.push('這是日常功能而非聊天室。依最後的任務只輸出正文，不輸出 ||、時間、帳號、角色標籤；若任務要求點數標記則保留。');else parts.push('用即時訊息的口吻，回一至三則簡短、自然的訊息。需要分成多則時使用 || 分隔，不加旁白或角色標籤。');
  if(request.lifeSummary&&!request.lifeMode)parts.push('【使用者授權的近期生活紀錄】\n'+request.lifeSummary+'\n只在自然相關時提起，不重複提醒；未填寫不代表沒有發生，不推測症狀或診斷。');
- if(request?.proactive)parts.push('這次由你主動開啟話題，可以接續近期對話。請直接傳訊，不假裝收到一則新訊息。');
+ if(request?.proactive)parts.push('【主動訊息規則】\n'+(clean(character.proactiveRules)||C.PROACTIVE_RULE)+'\n這是手機私訊，不是小說或角色扮演敘事。只輸出實際傳出的訊息，禁止動作旁白、對話引號或角色標籤。');
  parts.push('請遵守以上角色、世界與記憶邊界。不要假裝知道未提供的共同經歷；若資料彼此衝突，以較具體、較新的當前對話為準。');
- return clip(parts.join('\n\n'),MAX_INSTRUCTION_CHARS);
+ const tail=parts.slice(-5).join('\n\n');return clip(parts.slice(0,-5).join('\n\n'),Math.max(0,MAX_INSTRUCTION_CHARS-tail.length-100))+'\n\n'+tail;
 }
 function buildContents(request){
  const source=Array.isArray(request?.messages)?request.messages:[];const chosen=[];let used=0,images=0;
@@ -597,7 +608,7 @@ function localDate(date=new Date()){
 const metrics={water:['喝水','mL',0,20000],sleep:['睡眠','小時',0,24],weight:['體重','kg',0,600]};
 function points(workspace){return workspace.life.wallet.reduce((value,row)=>value+(Number.isInteger(row.amount)?row.amount:0),100);}
 function isDemo(row){return row.mock===true||/^（示範）/.test(String(row.text));}
-function cleanText(text){return String(text||'').replace(/\|\|/g,'\n').replace(/^\s*(?:✨\s*)?\d{1,2}:\d{2}\s*\|\s*@[^\n]+\n?/gm,'').replace(/\n{3,}/g,'\n\n').trim();}
+function cleanText(text){return String(text||'').replace(/\|\|/g,'\n').replace(/^\s*(?:✨\s*)?\d{1,2}:\d{2}\s*\|\s*@[^\n]+\n?/gm,'').replace(/^\s*\(?@[\w.-]+\)?\s*$/gm,'').replace(/\n{3,}/g,'\n\n').trim();}
 function summary(w,world){if(world.lifeAccess!==true)return '';const today=localDate(),y=new Date();y.setDate(y.getDate()-1);const yesterday=localDate(y);const rows=w.life?.records||[];const lines=[];for(const date of [today,yesterday]){for(const metric of ['water','sleep']){const row=rows.find(r=>r.date===date&&r.metric===metric);if(row&&Number.isFinite(Number(row.value)))lines.push(date+' '+metrics[metric][0]+' '+row.value+' '+metrics[metric][1]);}}if(rows.some(r=>r.date===today&&r.metric==='period'&&Number(r.value)>0)){let days=1,d=new Date();for(let i=0;i<30;i++){d.setDate(d.getDate()-1);if(!rows.some(r=>r.date===localDate(d)&&r.metric==='period'&&Number(r.value)>0))break;days++;}lines.push('今天有經期標記，連續標記第 '+days+' 天。');}if(lines.some(x=>x.includes('喝水')))lines.push('自訂每日飲水目標 '+(w.life.waterGoal||2000)+' mL。');return lines.join('\n');}
 root.LittleLife={normalize,localDate,metrics,points,isDemo,cleanText,summary};
 })(globalThis);
@@ -629,6 +640,7 @@ Object.assign(paths,chatTools);
 const roomLabel=()=> '對話';
 function toast(message,error=false){const e=$('#toast');e.textContent=message;e.className='toast visible'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.className='toast',6000);}
 function date(s,opts){const d=new Date(s);return Number.isNaN(+d)?'':d.toLocaleString('zh-TW',opts||{hour:'2-digit',minute:'2-digit',hour12:false});}
+function dayLabel(value){const d=LittleLife.localDate(new Date(value)),today=LittleLife.localDate(),y=new Date();y.setDate(y.getDate()-1);if(d===today)return '今天';if(d===LittleLife.localDate(y))return '昨天';return d.slice(0,4)===today.slice(0,4)?Number(d.slice(5,7))+' 月 '+Number(d.slice(8))+' 日':d;}
 function retainDraft(){const t=$('#message-input');if(t)drafts.set(draftKey(),t.value);}
 async function change(fn,message){if(busy)return false;retainDraft();busy=true;document.body.classList.add('working');try{await service.change(fn);if(message)toast(message);return true;}catch(e){toast(e.message||'儲存失敗，請匯出備份。',true);return false;}finally{busy=false;document.body.classList.remove('working');render();}}
 function navButton(route,label,n){return `<button class="nav-item ${view===route?'active':''}" data-view="${route}">${icon(n)}<span>${label}</span>${view===route?'<span class="nav-dot"></span>':''}</button>`;}
@@ -646,7 +658,7 @@ function render(){
  <div class="thread-heading"><span>這個世界的對話</span><button class="icon-btn" data-action="new-thread" aria-label="新增對話" title="新增對話">${icon('plus')}</button></div>
  <label class="search-box">${icon('search')}<input id="thread-search" placeholder="找一段對話" value="${esc(search)}" aria-label="搜尋目前世界的對話"></label>
  <div class="thread-list">${threads.map(t=>`<button class="thread ${t.id===thread?.id?'selected':''}" data-thread="${t.id}"><span>${icon('chat')}</span><div>${esc(t.title)}<small>${roomLabel(t)} · ${date(t.updatedAt,{month:'short',day:'numeric'})}${unread.has(t.id)?' · 未讀':''}</small></div></button>`).join('')||'<div class="list-empty">還沒有對話，<br>從一句話開始就好。</div>'}</div></div>
- <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.3</span></div></div></aside>
+ <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.4</span></div></div></aside>
  <main class="main ${view==='chat'?'chat-mode messenger':''}"><header class="topbar"><button class="icon-btn mobile-only" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button><div class="breadcrumb"><span>${esc(character.name)}</span><span class="slash">/</span><select id="world-select" aria-label="切換世界">${w().worlds.filter(x=>x.characterId===character.id).map(x=>`<option value="${x.id}" ${x.id===world.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div><span class="provider-pill"><i></i>${esc(provider?.label||model.provider)}<span class="wide-text"> · ${esc(model.model)}</span></span><button class="icon-btn context-button" data-action="context" aria-label="查看本次上下文" title="查看本次上下文">${icon('file')}</button></header>
  ${view==='chat'?chatPage(character,world,thread):view==='profile'?profilePage(character,world):['feed','records'].includes(view)?lifePage(view,character,world):settingsPage()}
  </main>`;
@@ -678,7 +690,7 @@ function chatPage(c,world,t){
  ${t?'<button type="button" data-action="mark-unread">標為未讀</button><button type="button" data-action="rename-thread">重新命名</button><button type="button" data-action="export-thread">匯出對話</button><button type="button" class="danger" data-action="delete-thread">刪除對話</button>':''}
  <button type="button" data-action="context">查看模型資料</button></div></details></header>
  <div class="messages" id="messages" role="log" aria-label="聊天紀錄"><div class="message-column">${all.length>messages.length?'<button class="button secondary load-history" data-action="older-messages">載入更早的訊息</button>':''}
- ${messages.length?messages.map((m,i)=>(i===0||LittleLife.localDate(new Date(m.createdAt))!==LittleLife.localDate(new Date(messages[i-1].createdAt))?`<div class="date-divider">${esc(LittleLife.localDate(new Date(m.createdAt)))}</div>`:'')+messageBubble(m,c,byId)).join(''):'<p class="im-empty">還沒有訊息。可以先打個招呼，或點星星讓角色來找妳。</p>'}</div></div>
+ ${messages.length?messages.map((m,i)=>(i===0||LittleLife.localDate(new Date(m.createdAt))!==LittleLife.localDate(new Date(messages[i-1].createdAt))?`<div class="date-divider">${esc(dayLabel(m.createdAt))}</div>`:'')+messageBubble(m,c,byId)).join(''):'<p class="im-empty">還沒有訊息。可以先打個招呼，或點星星讓角色來找妳。</p>'}</div></div>
  ${sendError?`<p class="send-error" role="alert">${esc(sendError)}</p>`:''}
  <div class="im-composer-wrap"><form id="compose-form" class="im-composer">
  ${composerQuote?`<div class="quote-draft">${quoteBlock(composerQuote)}<button type="button" class="quote-action" id="clear-quote">取消引用</button></div>`:''}
@@ -738,13 +750,13 @@ function lifePage(route,character,world){
  const events=life.events.filter(row=>row.worldId===world.id);
  const groups=life.groups.filter(row=>row.worldId===world.id);
  return `<section class="page-scroll life-page"><h1>角色日常</h1><p>${esc(character.name)} · ${esc(world.name)}</p>
- <section class="life-card"><h2>動態</h2><div class="button-row"><button class="button secondary" data-action="new-post">發動態</button><button class="button secondary" data-action="role-post">讓角色發動態</button></div>
+ <section class="life-card"><h2>動態</h2><button class="button secondary" data-action="export-posts">匯出本世界動態</button><div class="button-row"><button class="button secondary" data-action="new-post">發動態</button><button class="button secondary" data-action="role-post">讓角色發動態</button></div>
  ${posts.slice(-20).reverse().map(row=>`<article><strong>${esc(row.author)}</strong><p>${esc(LittleLife.cleanText(row.text))}</p>
  ${row.comments.map(comment=>`<p class="life-comment"><strong>${esc(comment.author)}</strong> ${esc(comment.text)}</p>`).join('')}
  <button class="button secondary" data-life-comment="${esc(row.id)}">留言</button>
  <button class="button secondary" data-life-role-comment="${esc(row.id)}">讓角色留言</button>${lifeEditButtons('posts',row)}</article>`).join('')}</section>
- <section class="life-card"><h2>角色日記</h2><button class="button secondary" data-action="role-diary">寫一篇／重新生成今日日記</button>
- ${diary.slice(-14).reverse().map(row=>`<article><time>${esc(row.date)}</time><p>${esc(LittleLife.cleanText(row.text))}</p>${lifeEditButtons('diaries',row)}</article>`).join('')}</section>
+ <section class="life-card"><h2>角色日記</h2><button class="button secondary" data-action="export-diaries">匯出本世界日記</button><button class="button secondary" data-action="role-diary">寫一篇／重新生成今日日記</button>
+ ${diary.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(row=>`<article><details class="diary-entry"><summary><time>${esc(row.date)}</time><span class="diary-preview">${esc(LittleLife.cleanText(row.text).slice(0,65))}…</span></summary><p>${esc(LittleLife.cleanText(row.text))}</p></details>${lifeEditButtons('diaries',row)}</article>`).join('')}</section>
  <section class="life-card"><h2>開啟小倉庫時自動更新</h2><form id="routine-form">
  <label class="checkbox"><input type="checkbox" name="post" ${world.dailyPost===true?'checked':''}>每天讓角色發一則動態</label>
  <label class="checkbox"><input type="checkbox" name="diary" ${world.dailyDiary===true?'checked':''}>每天讓角色寫一篇日記</label>
@@ -840,7 +852,7 @@ async function lifeText(workspace,instruction,character,history=[]){
  }
  request.messages=request.messages.map(({role,content})=>({role,content}));
  request.request.maxOutputTokens=600;
- request.messages.push({role:'user',content:instruction});
+ request.messages.push({role:'user',content:instruction+'\n目前裝置日期：'+LittleLife.localDate()+'。請不要複製範例日期或帳號；日記不必在正文重複日期，動態只寫正文。'});
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),35000);
  try{
   const result=await C.generateWithRetry(provider,request,{signal:controller.signal,model:model.model});
@@ -960,7 +972,7 @@ async function lifeAction(name,character,world){
  return false;
 }
 
-function profilePage(c,world){const refs=w().references.filter(r=>r.worldId===world.id);return `<section class="page-scroll"><div class="page-content"><span class="eyebrow">CHARACTER / WORLD</span><h1>讓每個人，有自己的位置。</h1><p class="page-intro">角色設定可以沿用，世界的記憶各自保存。這裡的欄位都可以改。</p><div class="profile-grid"><div class="card"><div class="card-heading"><h2>角色資料</h2><span class="tag">跨這個角色的世界共用</span></div><form id="character-form"><div class="avatar-editor">${avatar(c,'large')}<div><label class="button secondary upload-label">${icon('upload')}更換頭像<input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" hidden></label><small>PNG / JPG / WebP，1.5 MB 以內</small></div></div><label class="field">名字<input name="name" value="${esc(c.name)}" required maxlength="60"></label><label class="field">一句介紹<input name="description" value="${esc(c.description)}" maxlength="200"></label><label class="field">人設與回應方式<textarea name="persona" rows="8" maxlength="200000">${esc(c.persona)}</textarea><small>起始範本不是完整記憶。可以貼入妳自己的角色設定。</small></label><label class="field">回覆節奏<select name="pace">${[['fast','即時'],['steady','自然'],['slow','慢一點']].map(([value,label])=>`<option value="${value}" ${c.pace===value?'selected':''}>${label}</option>`).join('')}</select></label><button class="button primary" type="submit">${icon('check')}儲存角色資料</button></form><div class="card-footer"><button class="text-button" data-action="duplicate-character">${icon('copy')}複製角色設定</button><button class="text-button danger" data-action="delete-character">刪除角色</button></div></div>
+function profilePage(c,world){const refs=w().references.filter(r=>r.worldId===world.id);return `<section class="page-scroll"><div class="page-content"><span class="eyebrow">CHARACTER / WORLD</span><h1>讓每個人，有自己的位置。</h1><p class="page-intro">角色設定可以沿用，世界的記憶各自保存。這裡的欄位都可以改。</p><div class="profile-grid"><div class="card"><div class="card-heading"><h2>角色資料</h2><span class="tag">跨這個角色的世界共用</span></div><form id="character-form"><div class="avatar-editor">${avatar(c,'large')}<div><label class="button secondary upload-label">${icon('upload')}更換頭像<input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" hidden></label><small>PNG / JPG / WebP，1.5 MB 以內</small></div></div><label class="field">名字<input name="name" value="${esc(c.name)}" required maxlength="60"></label><label class="field">一句介紹<input name="description" value="${esc(c.description)}" maxlength="200"></label><label class="field">人設與回應方式<textarea name="persona" rows="8" maxlength="200000">${esc(c.persona)}</textarea><small>起始範本不是完整記憶。可以貼入妳自己的角色設定。</small></label><label class="field">主動訊息規則<textarea name="proactiveRules" rows="5" maxlength="8000">${esc(c.proactiveRules||C.PROACTIVE_RULE)}</textarea><small>適用星星與自動主動訊息；只輸出手機私訊，不寫小說旁白。</small></label><label class="field">回覆節奏<select name="pace">${[['fast','即時'],['steady','自然'],['slow','慢一點']].map(([value,label])=>`<option value="${value}" ${c.pace===value?'selected':''}>${label}</option>`).join('')}</select></label><button class="button primary" type="submit">${icon('check')}儲存角色資料</button></form><div class="card-footer"><button class="text-button" data-action="duplicate-character">${icon('copy')}複製角色設定</button><button class="text-button danger" data-action="delete-character">刪除角色</button></div></div>
  <div><div class="card"><div class="card-heading"><h2>世界 / IF 線</h2><button class="text-button" data-action="new-world">${icon('plus')}新增</button></div><div class="world-list">${w().worlds.filter(x=>x.characterId===c.id).map(x=>`<button class="world-item ${x.id===world.id?'active':''}" data-world="${x.id}"><span class="world-symbol">${icon('moon')}</span><div>${esc(x.name)}<small>${w().threads.filter(t=>t.worldId===x.id).length} 段對話 · 獨立記憶</small></div>${x.id===world.id?icon('check'):icon('chevron')}</button>`).join('')}</div><div class="button-row"><button class="button secondary" data-action="edit-world">${icon('edit')}編輯「${esc(world.name)}」</button><button class="button secondary" data-action="export-world-story">${icon('download')}匯出這個世界劇情</button></div></div>
  <div class="card reference-card"><div class="card-heading"><h2>參考資料</h2><span class="tag">只給 ${esc(world.name)}</span></div><p>純文字與 Markdown，保留原文。不會自動讀取其他世界的檔案。</p><div class="reference-list">${refs.map(r=>`<div class="reference-item">${icon('file')}<button class="reference-name" data-reference="${r.id}">${esc(r.name)}<small>${r.content.length.toLocaleString()} 字</small></button><button class="icon-btn" data-remove-reference="${r.id}" aria-label="刪除 ${esc(r.name)}">${icon('trash')}</button></div>`).join('')||'<div class="soft-empty">還沒有參考資料</div>'}</div><label class="button secondary full upload-label">${icon('plus')}一次加入 TXT / MD<input type="file" id="reference-file" accept=".txt,.md,text/plain,text/markdown" multiple hidden></label><small class="hint">可多選（Ctrl／Shift）；每份 1 MB、250,000 字以內。只在本機保存。</small></div></div></div></div></section>`;}
 function settingsPage(){const catalog=providerCatalog(),model=modelSettings(),provider=catalog.find(p=>p.id===model.provider)||catalog[0],models=provider?.models||[{id:model.model,label:model.model}],knownModel=models.some(x=>x.id===model.model),customModel=knownModel?'':model.model;return `<section class="page-scroll"><div class="page-content settings-content"><h1>設定與備份</h1>
@@ -983,16 +995,16 @@ function settingsPage(){const catalog=providerCatalog(),model=modelSettings(),pr
  <p class="hint">聊天上下文和最近的圖片會送到妳填的網址。只使用妳信任、支援跨來源連線的 HTTPS 伺服器。</p>
  <div class="button-row"><button class="button secondary" type="submit">使用自訂 API</button>${LittleCustom.getUrl()?'<button class="button secondary" type="button" data-action="clear-custom-api">清除自訂 API</button>':''}</div></form></div>
  <div class="card"><div class="card-heading"><h2>模型連線</h2><span class="tag">Mock / Gemini / 自訂 API</span></div><form id="model-settings-form" class="settings-form"><label class="field">Provider<select id="provider-select" name="provider">${catalog.map(p=>`<option value="${esc(p.id)}" ${p.id===model.provider?'selected':''}>${esc(p.label)}</option>`).join('')}</select></label><label class="field">模型<select id="model-select" name="model">${models.map(x=>`<option value="${esc(x.id)}" ${x.id===model.model?'selected':''}>${esc(x.label)}</option>`).join('')}<option value="__custom__" ${!knownModel?'selected':''}>自訂 model ID…</option></select></label><label class="field">自訂 model ID<input id="custom-model-input" name="customModel" maxlength="120" value="${esc(customModel)}" placeholder="例如：gpt-6.2-sol"><small>只有選「自訂 model ID…」時使用。限英數、-、_、.；請貼服務商官方 model ID。</small></label><label class="field">模型回覆上限<select name="maxOutputTokens">${[[150,'極短訊息'],[300,'自然聊天（預設）'],[600,'較長回覆']].map(([n,label])=>`<option value="${n}" ${model.maxOutputTokens===n?'selected':''}>${n} tokens · ${label}</option>`).join('')}</select></label><label class="field">最近對話帶入數<select name="contextMessages">${[10,20,30,50].map(n=>`<option value="${n}" ${model.contextMessages===n?'selected':''}>${n} 則</option>`).join('')}</select></label><label class="field">暫時錯誤重試<select name="retryCount">${[0,1,2].map(n=>`<option value="${n}" ${model.retryCount===n?'selected':''}>${n===0?'不自動重試':n+' 次'}</option>`).join('')}</select></label><button class="button primary" type="submit">儲存模型設定</button></form><div class="provider-row"><span class="provider-symbol">${icon('moon')}</span><div><strong>${esc(provider?.label||model.provider)}</strong><p>${esc(provider?.description||'目前沒有載入這個 Provider。')}</p></div><span class="connected">${provider?.external?'外部服務':'本機測試'}</span></div><p class="hint">外部 Provider 只會把目前角色、目前世界、該世界參考資料與最近 N 則訊息送到妳選擇的服務商。聊天室以短訊息方式回覆。金鑰不包含在工作區和備份。</p></div>
- <div class="card"><div class="card-heading"><h2>完整備份</h2><span class="tag">聊天室資料</span></div><p>包含全部角色的聊天、人設、世界／IF 記憶、參考資料與模型偏好。故事館已獨立保存，不會混進這份備份。匯入會取代目前整份聊天室資料。</p><div class="button-row"><button class="button primary" data-action="export-backup">${icon('download')}匯出整包備份</button><label class="button secondary upload-label">${icon('upload')}還原備份<input id="backup-file" type="file" accept=".json,application/json" hidden></label></div><div class="notice">瀏覽器資料可能被清除，也不會在不同裝置自動同步。請定期把備份檔另存一份。</div></div>
+ <div class="card"><div class="card-heading"><h2>完整備份</h2><span class="tag">聊天室資料</span></div><p>包含全部角色的聊天、人設、世界／IF 記憶、參考資料、模型偏好、動態、日記及生活紀錄。金鑰不包含在備份內。故事館已獨立保存，不會混進這份備份。匯入會取代目前整份聊天室資料。</p><div class="button-row"><button class="button primary" data-action="export-backup">${icon('download')}匯出整包備份</button><label class="button secondary upload-label">${icon('upload')}還原備份<input id="backup-file" type="file" accept=".json,application/json" hidden></label></div><div class="notice">瀏覽器資料可能被清除，也不會在不同裝置自動同步。更新 GitHub 前請匯出完整備份；不要刪除主畫面 App。Safari 與主畫面 App 的資料可能分開保存。</div></div>
  <div class="card"><div class="card-heading"><h2>角色資料包</h2><span class="tag">只搬目前角色</span></div><p>預設只帶人設、頭像、世界設定與參考資料。共同記憶和聊天紀錄預設不帶。</p><label class="checkbox"><input id="include-history" type="checkbox">一併帶走這個角色的世界記憶與聊天</label><div class="button-row"><button class="button secondary" data-action="export-character">${icon('download')}匯出角色包</button><button class="button secondary" data-action="export-character-story">${icon('download')}匯出角色全部劇情</button><label class="button secondary upload-label">${icon('upload')}加入角色包<input id="package-file" type="file" accept=".json,application/json" hidden></label></div><small class="hint">參考資料會隨設定匯出；若裡面有私人經歷，請自行檢查。匯入角色包會新增角色，不會覆蓋現有角色。</small></div>
  <div class="storage-footer">${icon('shield')}<div><strong>${esc(repo.name)}</strong><span>${w().characters.length} 位角色 · ${w().worlds.length} 個世界 · ${w().messages.length} 則訊息</span></div><span class="version">WEB</span></div></div></section>`;}
 function bind(){
  bindLife();
- document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{retainDraft();view=b.dataset.view;drawer=false;render();if(view==='chat')markCurrentThreadRead();});
+ document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{if(busy)return;retainDraft();view=b.dataset.view;drawer=false;render();if(view==='chat')markCurrentThreadRead();});
  document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>action(b.dataset.action));
  $('#character-select').onchange=e=>selectCharacter(e.target.value);
  if($('#world-select'))$('#world-select').onchange=e=>selectWorld(e.target.value);
- $('#thread-search').oninput=e=>{const pos=e.target.selectionStart;search=e.target.value;retainDraft();render();$('#thread-search').focus();$('#thread-search').setSelectionRange(pos,pos);};
+ $('#thread-search').oninput=e=>{if(busy)return;const pos=e.target.selectionStart;search=e.target.value;retainDraft();render();$('#thread-search').focus();$('#thread-search').setSelectionRange(pos,pos);};
  document.querySelectorAll('[data-thread]').forEach(b=>b.onclick=async()=>{if(await change(d=>{d.selected.threadId=b.dataset.thread;markThreadRead(d,b.dataset.thread);})){view='chat';drawer=false;render();}});
  document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>selectWorld(b.dataset.world));
  document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>{$('#message-input').value=b.dataset.prompt;resizeInput();$('#message-input').focus();});
@@ -1020,7 +1032,7 @@ function bind(){
   catch(error){toast(error.message,true);}
  };
  if($('#compose-form')){$('#compose-form').onsubmit=send;$('#message-input').oninput=()=>{drafts.set(draftKey(),$('#message-input').value);resizeInput();};$('#message-input').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();send(e);}};}
- if($('#character-form')){$('#character-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),cid=scope().character.id;await change(d=>Object.assign(d.characters.find(c=>c.id===cid),{name:String(f.get('name')).trim(),description:String(f.get('description')),persona:String(f.get('persona')),pace:String(f.get('pace'))}),'角色資料已儲存');};$('#avatar-file').onchange=uploadAvatar;$('#reference-file').onchange=uploadReference;}
+ if($('#character-form')){$('#character-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),cid=scope().character.id;await change(d=>Object.assign(d.characters.find(c=>c.id===cid),{name:String(f.get('name')).trim(),description:String(f.get('description')),persona:String(f.get('persona')),proactiveRules:String(f.get('proactiveRules')),pace:String(f.get('pace'))}),'角色資料已儲存');};$('#avatar-file').onchange=uploadAvatar;$('#reference-file').onchange=uploadReference;}
  document.querySelectorAll('[data-reference]').forEach(b=>b.onclick=()=>{const r=w().references.find(r=>r.id===b.dataset.reference);modal('參考資料 · '+r.name,`<pre class="context-text">${esc(r.content)}</pre>`,{label:'關閉'});});
  document.querySelectorAll('[data-remove-reference]').forEach(b=>b.onclick=async()=>{const r=w().references.find(r=>r.id===b.dataset.removeReference);if(await confirmDialog('移除參考資料？',`只移除「${esc(r.name)}」，不會刪除原始檔案。`,'移除'))await change(d=>{d.references=d.references.filter(x=>x.id!==r.id);},'參考資料已移除');});
  const customAPI=$('#custom-api-form');
@@ -1118,21 +1130,24 @@ async function submitMessage(content,options={}){
  retainDraft();
  const key=draftKey(),button=$('.send-button'),input=$('#message-input');
  sendError='';busy=true;
- const status=document.createElement('p');
- status.className='im-pending';status.setAttribute('role','status');status.textContent=scope().character.name+' 正在輸入…';
- $('#messages .message-column')?.append(status);
- scrollMessages();
- input.disabled=true;
- for(const control of document.querySelectorAll('.im-tools button'))control.disabled=true;
- button.type='button';button.innerHTML=icon('stop');button.setAttribute('aria-label','停止回覆');button.onclick=()=>service.cancel();
+ const replyTo=options.proactive?undefined:replyDrafts.get(key);
+ function pending(){
+  const status=document.createElement('p');status.className='im-pending';status.setAttribute('role','status');status.textContent=scope().character.name+' 正在輸入…';
+  $('#messages .message-column')?.append(status);scrollMessages();
+  for(const control of document.querySelectorAll('.im-tools button'))control.disabled=true;
+  const button=$('.send-button');if(button){button.type='button';button.innerHTML=icon('stop');button.setAttribute('aria-label','停止回覆');button.onclick=()=>service.cancel();}
+ }
+ pending();
  try{
-  await service.send(content,{modelOverride:modelSettings(),replyTo:options.proactive?undefined:replyDrafts.get(key),...options});
-  if(!options.proactive&&!options.kind){drafts.delete(key);replyDrafts.delete(key);}
-  if(options.kind)replyDrafts.delete(key);
+  await service.send(content,{modelOverride:modelSettings(),replyTo,...options,onCommitted:()=>{
+   if(!options.proactive&&!options.kind){drafts.delete(key);drafts.delete(draftKey());replyDrafts.delete(key);}
+   if(options.kind)replyDrafts.delete(key);
+   render();pending();
+  }});
  }catch(error){
   if(error?.code==='cancelled')toast('已停止回覆。');
   else sendError=error.message||'模型回覆失敗。';
- }finally{busy=false;render();}
+ }finally{retainDraft();busy=false;render();}
 }
 function showStickers(){
  const custom=w().settings.customStickers;
@@ -1231,6 +1246,7 @@ async function action(name){if(busy)return;
  if(name==='new-world')modal('另一個世界',inputField('世界 / IF 線名稱','name')+inputField('這個世界的設定','instructions','',5),{label:'建立世界',submit:async f=>{if(!await change(d=>{const id=C.id();d.worlds.push({id,characterId:character.id,name:String(f.get('name')).trim(),instructions:String(f.get('instructions')),memory:''});d.selected={characterId:character.id,worldId:id,threadId:null};},'世界已建立，記憶從空白開始'))throw Error('建立失敗');search='';render();}});
  if(name==='edit-world')modal('編輯世界 · '+world.name,inputField('名稱','name',world.name)+inputField('世界設定','instructions',world.instructions,5)+inputField('手動記憶筆記','memory',world.memory,6)+'<p class="hint">只有這個世界會讀到這份記憶。這版不會自動整理或生成長期記憶。</p>',{submit:async f=>{if(!await change(d=>Object.assign(d.worlds.find(x=>x.id===world.id),{name:String(f.get('name')).trim(),instructions:String(f.get('instructions')),memory:String(f.get('memory'))}),'世界設定已儲存'))throw Error('儲存失敗');}});
  if(name==='context'){const preview=providerPayloadPreview();modal('本次實際送出的模型資料',`<div class="notice">目前 Provider：${esc(preview.provider)} / ${esc(preview.model)}。下方已套用該 Provider 的實際字數預算與截斷規則；也就是送出時真正形成的 payload（不含 API key）。目前最多帶入最近 ${preview.contextMessages} 則訊息；這間房的單次回覆上限 ${preview.maxOutputTokens} tokens。</div><pre class="context-text">${esc(JSON.stringify(preview.payload,null,2))}</pre>`,{label:'看好了',cancel:false,wide:true});}
+ if(name==='export-diaries'||name==='export-posts'){const rows=w().life[name==='export-diaries'?'diaries':'posts'].filter(r=>r.worldId===world.id).sort((a,b)=>String(a.date).localeCompare(String(b.date)));await exportText('little-'+name+'-'+safeFilePart(character.name)+'.md',rows.map(r=>'## '+r.date+' · '+r.author+'\n\n'+r.text+'\n'+(r.comments||[]).map(c=>c.author+'：'+c.text).join('\n')).join('\n\n---\n\n'));return;}
  if(name==='export-thread'&&thread){const text=['# '+thread.title,'','角色：'+character.name,'世界：'+world.name,'匯出時間：'+exportStamp(),'','---','',threadMarkdown(thread,character,world,{heading:2,includeMeta:false})].join('\n');await exportText('moonlit-thread-'+safeFilePart(character.name)+'-'+safeFilePart(world.name)+'-'+safeFilePart(thread.title)+'.md',text);}
  if(name==='export-world-story'){await exportText('moonlit-world-'+safeFilePart(character.name)+'-'+safeFilePart(world.name)+'.md',worldMarkdown(character,world));}
  if(name==='export-character-story'){await exportText('moonlit-character-story-'+safeFilePart(character.name)+'.md',characterMarkdown(character));}
@@ -1262,6 +1278,8 @@ async function uploadReference(e){
 async function init(){try{repo=await ChatStorage.open();let data=await repo.load();if(!data){data=C.seed();await repo.save(data);}else{data=C.validate(data);}service=new C.WorkspaceService(repo,data);render();setTimeout(runDailyLife,0);}catch(e){$('#app').innerHTML=`<main class="fatal"><span class="brand-icon">${icon('moon')}</span><h1>本機資料暫時無法開啟</h1><p>${esc(e.message)}</p><p>請確認 Safari 允許網站儲存，再重新整理。</p><button class="button primary" onclick="location.reload()">重新整理</button></main>`;}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer){drawer=false;render();}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)runDailyLife();});
+function updateViewport(){const v=window.visualViewport;document.documentElement.style.setProperty('--visible-height',(v?.height||window.innerHeight)+'px');}
+window.visualViewport?.addEventListener('resize',updateViewport);window.addEventListener('resize',updateViewport);updateViewport();
 init();
 })();
 </script></body></html>
