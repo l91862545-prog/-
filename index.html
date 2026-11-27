@@ -253,6 +253,7 @@ input[type=date]::-webkit-date-and-time-value{min-width:0;text-align:left}
 .metric-heading,.metric-main,.metric-history-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.metric-heading{justify-content:space-between}.metric-heading h3{margin:0}.metric-heading time,.metric-history-row time,.metric-main span,.metric-main small,.trend-dates{color:var(--muted);font-size:.85em}.metric-main{margin:12px 0 8px}.metric-main strong{font-size:32px;color:var(--green-dark);font-variant-numeric:tabular-nums;line-height:1.2}.metric-main small{margin-left:auto}.water-track{height:9px;border-radius:999px;background:var(--sage);overflow:hidden}.water-track span{display:block;height:100%;border-radius:999px;background:#91aa8d}.metric-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}.metric-actions .button{font-size:13px;min-height:36px;padding:6px 12px}.metric-history{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.metric-history summary{cursor:pointer;color:var(--green)}.metric-history-row{padding:10px 0;border-bottom:1px solid var(--line)}.metric-history-row .metric-actions{margin:0 0 0 auto}.metric-trend{color:var(--green);margin-top:8px}.metric-trend svg{display:block;width:100%;max-height:100px}.trend-dates{display:flex;justify-content:space-between;gap:4px;font-size:11px}
 
 .archive-section>summary{cursor:pointer;font-size:1.15rem;margin-bottom:12px}.archive-section:not([open])>summary{margin-bottom:0}.archive-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0}.archive-toolbar label{display:flex;align-items:center;gap:6px}.archive-toolbar select{max-width:140px}.archive-section article{margin-top:10px}.archive-section .diary-entry summary{overflow-wrap:anywhere}
+.mood-tags{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}.mood-tags label{position:relative}.mood-tags input{position:absolute;opacity:0;width:1px;height:1px}.mood-tags span{display:block;border:1px solid #d3dfce;border-radius:20px;padding:8px 13px;color:#526b50;background:#fff}.mood-tags input:checked+span{background:#526b50;color:white}.mood-tags input:focus-visible+span{outline:2px solid #526b50}.life-card #proactive-form{margin-bottom:20px;border-bottom:1px solid #d3dfce;padding-bottom:16px}
 
 @media(max-width:760px){.topbar,.chat-mode .topbar{height:calc(50px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}.chat-mode .composer-wrap{padding-bottom:max(12px,env(safe-area-inset-bottom))}}</style></head>
 <body><div id="app"><div class="boot">正在開啟小倉庫…</div></div><dialog id="modal" aria-label="操作視窗"></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -346,8 +347,8 @@ class WorkspaceService{
  change(mutate){const job=this.tail.then(async()=>{const next=copy(this.workspace);await mutate(next);const valid=validate(next);await this.repository.save(valid);this.workspace=valid;return valid;});this.tail=job.catch(()=>{});return job;}
  replace(w){const next=validate(w);return this.change(draft=>{for(const k of Object.keys(draft))delete draft[k];Object.assign(draft,next);});}
  cancel(){if(this.activeController&&!this.activeController.signal.aborted){this.activeController.abort();return true;}return false;}
- async send(content,{onDelta,onCommitted,modelOverride,replyTo,proactive=false,image,kind}={}){
-  if((!proactive&&!content.trim())||content.length>32000)throw Error('請輸入 1–32,000 個字。');
+ async send(content,{onDelta,onCommitted,modelOverride,replyTo,proactive=false,image,kind,giftCost=5,regenerateIds=[]}={}){
+  if((!proactive&&!regenerateIds.length&&!content.trim())||content.length>32000)throw Error('請輸入 1–32,000 個字。');
   if(this.activeController)throw Error('上一則回覆仍在處理中。');
   const controller=new AbortController();this.activeController=controller;
   const guardedDelta=value=>{if(!controller.signal.aborted)onDelta?.(value);};
@@ -358,17 +359,21 @@ class WorkspaceService{
    const message={id:id(),threadId:thread.id,role:'user',content:content.trim(),createdAt:now(),mock:false};
    if(w.messages.some(m=>m.id===replyTo&&m.threadId===thread.id))message.replyTo=replyTo;
    if(kind)message.kind=kind;
-   if(kind==='gift'&&globalThis.LittleLife){
-    if(LittleLife.points(w)<5)throw Error('虛擬點數不足。');
-    w.life.wallet.push({text:content,amount:-5});
+   if(kind==='gift'&&globalThis.LittleLife&&!regenerateIds.length){
+    if(!Number.isSafeInteger(giftCost)||giftCost<0||giftCost>LittleLife.points(w))throw Error('虛擬點數不足。');
+    w.life.wallet.push({text:content,amount:-giftCost});
    }
    if(validImage(image))message.image=image;
-   if(!proactive)w.messages.push(message);
-   if(first&&!proactive)thread.title=content.trim().slice(0,24);
+   if(!proactive&&!regenerateIds.length)w.messages.push(message);
+   if(first&&!proactive)thread.title=kind==='sticker'?'貼圖聊天':kind==='photo'?'照片聊天':content.trim().slice(0,24);
    model=normalizeModelSettings(modelOverride??w.settings.model);provider=providers.get(model.provider);
    if(!provider)throw new ProviderError('目前沒有安裝「'+model.provider+'」Provider。',{code:'provider_missing'});
    if(provider.id==='mock'&&provider.models.length&&!provider.models.some(x=>x.id===model.model))throw new ProviderError('目前 Provider 不支援「'+model.model+'」模型。',{code:'model_missing'});
-   request=context({...w,settings:{...w.settings,model}});
+   const prior=w.messages.filter(m=>m.threadId===thread.id&&m.id!==message.id).at(-1);
+   const gap=prior?Math.max(0,Math.round((Date.now()-Date.parse(prior.createdAt))/60000)):null;
+   const excluded=new Set(regenerateIds);
+   request=context({...w,messages:w.messages.filter(m=>!excluded.has(m.id)),settings:{...w.settings,model}});
+   request.world.instructions+='\n【當前時間】'+new Date().toLocaleString('zh-TW')+(gap===null?'':'；距上一則約 '+gap+' 分鐘')+'。最新使用者描述優先；跨日或久未聊天不延續舊場景，不確定就詢問。';
    request.proactive=proactive;
    const today=globalThis.LittleLife?.localDate();
    const events=w.life?.events.filter(row=>row.worldId===world.id&&(row.date===today||row.annual===true&&typeof row.date==='string'&&row.date.slice(5)===today.slice(5)))??[];
@@ -390,6 +395,7 @@ class WorkspaceService{
    if(controller.signal.aborted)throw abortError();
    const thread=w.threads.find(t=>t.id===targetId);if(!thread)throw Error('原聊天室不存在。');
    const message=w.messages.find(m=>m.id===messageId);if(message&&!answer.mock)message.readAt=now();
+   if(regenerateIds.length)w.messages=w.messages.filter(m=>!regenerateIds.includes(m.id));
    for(const content of bubbles)w.messages.push({...answer,content,id:id(),threadId:thread.id,createdAt:now()});
    thread.updatedAt=now();
    if(controller.signal.aborted)throw abortError();
@@ -603,7 +609,7 @@ root.LittleCustom={getUrl:()=>config.url,save};
 function normalize(workspace){
  const life=workspace.life && typeof workspace.life==='object'?workspace.life:{};
  workspace.life=life;
- for(const key of ['posts','diaries','events','records','groups','wallet']){
+ for(const key of ['posts','diaries','events','records','groups','wallet','moods']){
   life[key]=Array.isArray(life[key])?life[key].filter(row=>row&&typeof row==='object'&&!Array.isArray(row)).slice(key==='wallet'||key==='records'?-100000:-500):[];
  }
  for(const post of life.posts)post.comments=Array.isArray(post.comments)?post.comments.slice(-100):[];
@@ -611,6 +617,7 @@ function normalize(workspace){
   group.members=Array.isArray(group.members)?group.members.slice(0,4):[];
   group.messages=Array.isArray(group.messages)?group.messages.slice(-160):[];
  }
+ if(!Array.isArray(life.shop))life.shop=['奶茶','小蛋糕','草莓','愛心晚餐','花束','戒指','玩偶','情書','新手機','包包','口紅','珠寶','性感睡衣','蕾絲內衣','三角褲','丁字褲','親親兌換券'].map((name,i)=>({id:'gift-'+i,name,price:i===8?80:5}));
  return life;
 }
 function localDate(date=new Date()){
@@ -620,7 +627,7 @@ const metrics={water:['喝水','mL',0,20000],sleep:['睡眠','小時',0,24],weig
 function points(workspace){return workspace.life.wallet.reduce((value,row)=>value+(Number.isInteger(row.amount)?row.amount:0),100);}
 function isDemo(row){return row.mock===true||/^（示範）/.test(String(row.text));}
 function cleanText(text){return String(text||'').replace(/\|\|/g,'\n').replace(/^\s*(?:✨\s*)?\d{1,2}:\d{2}\s*\|\s*@[^\n]+\n?/gm,'').replace(/^\s*\(?@[\w.-]+\)?\s*$/gm,'').replace(/\n{3,}/g,'\n\n').trim();}
-function summary(w,world){if(world.lifeAccess!==true)return '';const today=localDate(),y=new Date();y.setDate(y.getDate()-1);const yesterday=localDate(y);const rows=w.life?.records||[];const lines=[];for(const date of [today,yesterday]){for(const metric of ['water','sleep']){const row=rows.find(r=>r.date===date&&r.metric===metric);if(row&&Number.isFinite(Number(row.value)))lines.push(date+' '+metrics[metric][0]+' '+row.value+' '+metrics[metric][1]);}}if(rows.some(r=>r.date===today&&r.metric==='period'&&Number(r.value)>0)){let days=1,d=new Date();for(let i=0;i<30;i++){d.setDate(d.getDate()-1);if(!rows.some(r=>r.date===localDate(d)&&r.metric==='period'&&Number(r.value)>0))break;days++;}lines.push('今天有經期標記，連續標記第 '+days+' 天。');}if(lines.some(x=>x.includes('喝水')))lines.push('自訂每日飲水目標 '+(w.life.waterGoal||2000)+' mL。');return lines.join('\n');}
+function summary(w,world){if(world.lifeAccess!==true&&world.moodAccess!==true)return '';const today=localDate(),y=new Date();y.setDate(y.getDate()-1);const yesterday=localDate(y);const rows=w.life?.records||[];const lines=[];if(world.moodAccess===true){const mood=(w.life.moods||[]).find(r=>r.date===today);if(mood)lines.push('今日自行填寫的心情：'+(mood.moods||[]).join('、')+'；身體：'+(mood.symptoms||[]).join('、')+'；備註：'+(mood.note||''));}if(world.lifeAccess!==true)return lines.join('\n');for(const date of [today,yesterday]){for(const metric of ['water','sleep']){const row=rows.find(r=>r.date===date&&r.metric===metric);if(row&&Number.isFinite(Number(row.value)))lines.push(date+' '+metrics[metric][0]+' '+row.value+' '+metrics[metric][1]);}}if(rows.some(r=>r.date===today&&r.metric==='period'&&Number(r.value)>0)){let days=1,d=new Date();for(let i=0;i<30;i++){d.setDate(d.getDate()-1);if(!rows.some(r=>r.date===localDate(d)&&r.metric==='period'&&Number(r.value)>0))break;days++;}lines.push('今天有經期標記，連續標記第 '+days+' 天。');}if(lines.some(x=>x.includes('喝水')))lines.push('自訂每日飲水目標 '+(w.life.waterGoal||2000)+' mL。');return lines.join('\n');}
 function trend(rows,today){
  const end=new Date(today+'T12:00:00');if(!Number.isFinite(end.getTime()))return '';
  const dates=Array.from({length:7},(_,i)=>{const d=new Date(end);d.setDate(d.getDate()-6+i);return localDate(d);});
@@ -680,7 +687,7 @@ function render(){
  <div class="thread-heading"><span>這個世界的對話</span><button class="icon-btn" data-action="new-thread" aria-label="新增對話" title="新增對話">${icon('plus')}</button></div>
  <label class="search-box">${icon('search')}<input id="thread-search" placeholder="找一段對話" value="${esc(search)}" aria-label="搜尋目前世界的對話"></label>
  <div class="thread-list">${threads.map(t=>`<button class="thread ${t.id===thread?.id?'selected':''}" data-thread="${t.id}"><span>${icon('chat')}</span><div>${esc(t.title)}<small>${roomLabel(t)} · ${date(t.updatedAt,{month:'short',day:'numeric'})}${unread.has(t.id)?' · 未讀':''}</small></div></button>`).join('')||'<div class="list-empty">還沒有對話，<br>從一句話開始就好。</div>'}</div></div>
- <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.7</span></div></div></aside>
+ <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.8</span></div></div></aside>
  <main class="main ${view==='chat'?'chat-mode messenger':''}"><header class="topbar"><button class="icon-btn mobile-only" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button><div class="breadcrumb"><span>${esc(character.name)}</span><span class="slash">/</span><select id="world-select" aria-label="切換世界">${w().worlds.filter(x=>x.characterId===character.id).map(x=>`<option value="${x.id}" ${x.id===world.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div><span class="provider-pill"><i></i>${esc(provider?.label||model.provider)}<span class="wide-text"> · ${esc(model.model)}</span></span><button class="icon-btn context-button" data-action="context" aria-label="查看本次上下文" title="查看本次上下文">${icon('file')}</button></header>
  ${view==='chat'?chatPage(character,world,thread):view==='profile'?profilePage(character,world):['feed','records'].includes(view)?lifePage(view,character,world):settingsPage()}
  </main>`;
@@ -697,7 +704,7 @@ function messageBubble(message,character,byId){
  const label=message.kind==='photo'&&message.content==='傳了一張照片。'||message.kind==='sticker'&&message.image?'':esc(message.content);
  return `<article class="im-row ${received?'incoming':'outgoing'}">${received?avatar(character,'im-avatar'):w().settings.playerAvatar?avatar({name:playerDisplay(w().settings),avatar:w().settings.playerAvatar},'im-avatar'):''}
  <div class="im-content">${quote?quoteBlock(quote):''}<div class="im-bubble ${message.kind==='sticker'?'im-sticker':''}">${media}${label}</div>
- <button type="button" class="quote-action" data-quote="${message.id}" aria-label="引用這則訊息">引用</button></div>
+ <button type="button" class="quote-action" data-quote="${message.id}" aria-label="引用這則訊息">引用</button><button type="button" class="quote-action" data-message-menu="${message.id}">⋯</button></div>
  <div class="im-meta">${!received&&message.readAt?`<span>已讀</span>`:''}${message.mock?'<span>示範</span>':''}<time>${esc(time)}</time></div></article>`;
 }
 function chatPage(c,world,t){
@@ -765,7 +772,7 @@ function lifePage(route,character,world){
    const trend=id==='water'?'':LittleLife.trend(rows,dateValue);
    return `<section class="life-card metric-card"><div class="metric-heading"><h3><span aria-hidden="true">${({water:'💧',sleep:'☾',weight:'⚖'})[id]}</span> ${label}</h3>${latest?`<time>${esc(latest.date)}</time>`:''}</div>${latest?`<div class="metric-main"><strong>${esc(latest.value)}</strong><span>${id==='water'?'/ '+esc(goal)+' mL':unit}</span>${id==='water'?`<small>${percent}%</small>`:''}</div>${id==='water'?`<div class="water-track" role="progressbar" aria-label="飲水目標" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${Math.min(goal,Math.max(0,Number(latest.value)||0))}"><span style="width:${Math.min(100,Math.max(0,percent))}%"></span></div>`:trend}${action(latest)}${history.length?`<details class="metric-history"><summary>歷史紀錄（${history.length} 筆）</summary>${history.map(row=>`<div class="metric-history-row"><time>${esc(row.date)}</time><strong>${esc(row.value)} ${unit}</strong>${action(row)}</div>`).join('')}</details>`:''}`:'<p class="hint">還沒有紀錄</p>'}</section>`;
   }).join('');
-  return `<section class="page-scroll life-page"><h1>我的紀錄</h1>${periodCalendar(life.records)}<form id="water-goal-form" class="life-card"><label class="field">每日飲水目標（mL）<input type="number" name="goal" inputmode="numeric" min="100" max="20000" value="${life.waterGoal||2000}" required></label><button class="button secondary">儲存目標</button></form><form id="record-form" class="life-card">
+  return `<section class="page-scroll life-page"><h1>我的紀錄</h1>${moodPanel()}${periodCalendar(life.records)}<form id="water-goal-form" class="life-card"><label class="field">每日飲水目標（mL）<input type="number" name="goal" inputmode="numeric" min="100" max="20000" value="${life.waterGoal||2000}" required></label><button class="button secondary">儲存目標</button></form><form id="record-form" class="life-card">
   <label class="field">日期<input name="date" type="date" value="${dateValue}" required></label>
   <label class="field">項目<select name="metric">${Object.entries(LittleLife.metrics).map(([id,[label,unit]])=>`<option value="${id}">${label}${unit?'（'+unit+'）':''}</option>`).join('')}</select></label>
   <label class="field" id="record-value-label">數值<input name="value" inputmode="decimal" type="number" min="0" max="20000" step="any" required></label>
@@ -778,7 +785,7 @@ function lifePage(route,character,world){
  return `<section class="page-scroll life-page"><h1>角色日常</h1><p>${esc(character.name)} · ${esc(world.name)}</p>
  ${lifeArchive('posts',posts,world.id)}
  ${lifeArchive('diaries',diary,world.id)}
- <section class="life-card"><h2>開啟小倉庫時自動更新</h2><form id="routine-form">
+ <section class="life-card"><h2>開啟小倉庫時自動更新</h2>${proactivePanel(world)}<form id="routine-form">
  <label class="checkbox"><input type="checkbox" name="post" ${world.dailyPost===true?'checked':''}>每天讓角色發一則動態</label>
  <label class="checkbox"><input type="checkbox" name="diary" ${world.dailyDiary===true?'checked':''}>每天讓角色寫一篇日記</label>
  <label class="checkbox"><input type="checkbox" name="lifeAccess" ${world.lifeAccess===true?'checked':''}>允許此世界的角色在私聊讀取經期、喝水、睡眠紀錄</label><p class="hint">啟用後，近期紀錄會傳送給選定的 API；不提供給群聊、動態或日記。</p><button class="button secondary" type="submit">儲存自動更新</button></form></section>
@@ -1034,7 +1041,7 @@ function settingsPage(){const catalog=providerCatalog(),model=modelSettings(),pr
  <div class="card"><div class="card-heading"><h2>角色資料包</h2><span class="tag">只搬目前角色</span></div><p>預設只帶人設、頭像、世界設定與參考資料。共同記憶和聊天紀錄預設不帶。</p><label class="checkbox"><input id="include-history" type="checkbox">一併帶走這個角色的世界記憶與聊天</label><div class="button-row"><button class="button secondary" data-action="export-character">${icon('download')}匯出角色包</button><button class="button secondary" data-action="export-character-story">${icon('download')}匯出角色完整紀錄</button><label class="button secondary upload-label">${icon('upload')}加入角色包<input id="package-file" type="file" accept=".json,application/json" hidden></label></div><small class="hint">參考資料會隨設定匯出；若裡面有私人經歷，請自行檢查。匯入角色包會新增角色，不會覆蓋現有角色。</small></div>
  <div class="storage-footer">${icon('shield')}<div><strong>${esc(repo.name)}</strong><span>${w().characters.length} 位角色 · ${w().worlds.length} 個世界 · ${w().messages.length} 則訊息</span></div><span class="version">WEB</span></div></div></section>`;}
 function bind(){
- bindLife();
+ bindLife();bind28();
  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{if(busy)return;retainDraft();view=b.dataset.view;drawer=false;render();if(view==='chat')markCurrentThreadRead();});
  document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>action(b.dataset.action));
  $('#character-select').onchange=e=>selectCharacter(e.target.value);
@@ -1207,9 +1214,11 @@ function showStickers(){
  };
 }
 function showGifts(){
- modal('送個禮物',`<label class="field">挑選禮物<select name="gift">${C.gifts.map(gift=>`<option value="${esc(gift)}">${esc(gift)} · 5 點</option>`).join('')}</select></label>`,
- {label:'送出',submit:form=>{if(LittleLife.points(w())<5)throw Error('虛擬點數不足。');const gift=form.get('gift');queueMicrotask(()=>submitMessage('🎁 '+gift,{kind:'gift'}));}});
+ const shop=w().life.shop;
+ modal('送禮／虛擬轉帳',`<p>虛擬餘額 ${LittleLife.points(w())} 點（不涉及真實金錢）</p><label class="field">禮物<select name="gift"><option value="custom">自訂禮物</option><option value="transfer">虛擬轉帳</option>${shop.map(g=>`<option value="${esc(g.id)}">${esc(g.name)} · ${g.price} 點</option>`).join('')}</select></label>${inputField('自訂名稱','custom')}<label class="field">自訂金額／轉帳點數<input name="cost" type="number" min="0" max="100000" step="1" value="5"></label>${inputField('留言','note')}<button type="button" class="button secondary" id="manage-shop">管理禮物商店</button>`,{label:'送出',submit:f=>{const selected=shop.find(g=>g.id===f.get('gift')),transfer=f.get('gift')==='transfer',name=selected?.name||(transfer?'虛擬轉帳':String(f.get('custom')).trim()),cost=selected?selected.price:Number(f.get('cost'));if(!name||!Number.isSafeInteger(cost)||cost<0||(transfer&&cost===0)||cost>LittleLife.points(w()))throw Error('請確認名稱、點數及餘額。');const note=String(f.get('note')).trim();setTimeout(()=>submitMessage((transfer?'💸 ':'🎁 ')+name+'（'+cost+' 點）'+(note?'：'+note:''),{kind:'gift',giftCost:cost}),0);}});
+ $('#manage-shop').onclick=manageShop;
 }
+function manageShop(){modal('管理禮物商店',`<p>每行一件：名稱｜點數。可以新增、改名或刪除。</p>${inputField('商品清單','items',w().life.shop.map(g=>g.name+'｜'+g.price).join('\n'),12)}`,{submit:async f=>{const lines=String(f.get('items')).split('\n').filter(x=>x.trim());if(lines.length>100)throw Error('最多 100 件');const items=lines.map(x=>{const [name,price,...rest]=x.split('｜');const n=Number(price);if(!name.trim()||!price?.trim()||rest.length||!Number.isSafeInteger(n)||n<0||n>100000)throw Error('格式：名稱｜非負整數點數');return {id:C.id(),name:name.trim().slice(0,80),price:n};});if(!await change(d=>{d.life.shop=items;},'商店已更新'))throw Error('未儲存');}});}
 function modal(title,body,{label='儲存',submit,cancel=true,wide=false,danger=false}={}){
  const d=$('#modal');if(d.open)d.close('cancel');d.returnValue='cancel';d.oncancel=()=>{d.returnValue='cancel';};d.className=wide?'wide-dialog':'';d.innerHTML=`<form id="modal-form"><div class="dialog-heading"><h2>${esc(title)}</h2><button type="button" class="icon-btn" id="modal-close" aria-label="關閉">${icon('close')}</button></div><div class="dialog-body">${body}</div><div class="dialog-footer">${cancel?'<button class="button secondary" type="button" id="modal-cancel">取消</button>':''}<button class="button ${danger?'danger-solid':'primary'}" type="submit">${esc(label)}</button></div></form>`;
  const close=()=>d.close('cancel');$('#modal-close').onclick=close;if($('#modal-cancel'))$('#modal-cancel').onclick=close;
@@ -1313,9 +1322,19 @@ async function uploadReference(e){
  }catch(err){toast(err.message||'讀取失敗，這批尚未加入。',true);}
  finally{busy=false;document.body.classList.remove('working');render();}
 }
-async function init(){try{repo=await ChatStorage.open();let data=await repo.load();if(!data){data=C.seed();await repo.save(data);}else{data=C.validate(data);}service=new C.WorkspaceService(repo,data);render();setTimeout(runDailyLife,0);}catch(e){$('#app').innerHTML=`<main class="fatal"><span class="brand-icon">${icon('moon')}</span><h1>本機資料暫時無法開啟</h1><p>${esc(e.message)}</p><p>請確認 Safari 允許網站儲存，再重新整理。</p><button class="button primary" onclick="location.reload()">重新整理</button></main>`;}}
+const moodTags=['開心','平靜','普通','難過','煩躁','焦慮','想哭','想撒嬌'],bodyTags=['經痛','腰痠','頭痛','脹氣','疲倦','失眠','想吃甜食','食慾不佳','身體不舒服'];
+function moodPanel(){const today=LittleLife.localDate(),rows=w().life.moods, row=rows.find(r=>r.date===today)||{};return `<section class="life-card"><h2>心情與身體</h2><form id="mood-form"><label class="field">日期<input type="date" name="date" value="${today}" required></label>${[['心情','moods',moodTags],['身體','symptoms',bodyTags]].map(([label,key,tags])=>`<h3>${label}</h3><div class="mood-tags">${tags.map(t=>`<label><input type="checkbox" name="${key}" value="${t}" ${(row[key]||[]).includes(t)?'checked':''}><span>${t}</span></label>`).join('')}</div>`).join('')}${inputField('備註（選填）','note',row.note||'',2)}<button class="button primary">儲存</button></form><details><summary>歷史紀錄（${rows.length}）</summary>${[...rows].sort((a,b)=>b.date.localeCompare(a.date)).map(r=>`<p>${esc(r.date)} · ${esc([...(r.moods||[]),...(r.symptoms||[]),r.note||''].join('、'))} <button type="button" class="button secondary" data-mood-edit="${esc(r.date)}">編輯</button> <button type="button" class="button secondary" data-mood-del="${esc(r.date)}">刪除</button></p>`).join('')}</details></section>`;}
+function proactivePanel(world){const p=world.proactive||{};return `<form id="proactive-form"><h3>主動訊息</h3><label class="checkbox"><input type="checkbox" name="enabled" ${p.enabled?'checked':''}>允許角色主動傳訊息</label><label class="field">大約間隔<select name="hours">${[1,2,4,8,24].map(h=>`<option value="${h}" ${h===(p.hours||4)?'selected':''}>${h} 小時</option>`).join('')}</select></label><label class="checkbox"><input type="checkbox" name="quiet" ${p.quiet!==false?'checked':''}>勿擾時段</label><label class="field">開始<input type="time" name="start" value="${esc(p.start||'00:00')}"></label><label class="field">結束<input type="time" name="end" value="${esc(p.end||'06:00')}"></label><label class="checkbox"><input type="checkbox" name="moodAccess" ${world.moodAccess?'checked':''}>允許讀取今日心情與身體紀錄（傳給 API）</label><p class="hint">風格由角色人設決定。只在網頁開啟且可見時執行，重開後最多補一則。不支援關閉後推播。近期聊天及行程沿用私聊規則；喝水與經期授權見下方。</p><button class="button secondary">儲存主動訊息設定</button></form>`;}
+function bind28(){const mf=$('#mood-form');if(mf){const load=()=>{const r=w().life.moods.find(x=>x.date===mf.elements.date.value)||{};for(const el of mf.querySelectorAll('input[type=checkbox]'))el.checked=(r[el.name]||[]).includes(el.value);mf.elements.note.value=r.note||'';};mf.elements.date.onchange=load;mf.onsubmit=async e=>{e.preventDefault();const f=new FormData(mf),date=String(f.get('date'));await change(d=>{d.life.moods=d.life.moods.filter(r=>r.date!==date);d.life.moods.push({date,moods:f.getAll('moods'),symptoms:f.getAll('symptoms'),note:String(f.get('note')).slice(0,1000)});},'心情已儲存');};for(const b of document.querySelectorAll('[data-mood-edit]'))b.onclick=()=>{mf.elements.date.value=b.dataset.moodEdit;load();mf.scrollIntoView({block:'nearest'});};for(const b of document.querySelectorAll('[data-mood-del]'))b.onclick=async()=>{if(confirm('刪除這天的心情紀錄？'))await change(d=>{d.life.moods=d.life.moods.filter(r=>r.date!==b.dataset.moodDel);},'已刪除');};}
+ const pf=$('#proactive-form');if(pf)pf.onsubmit=async e=>{e.preventDefault();const f=new FormData(pf),wid=scope().world.id;await change(d=>{const world=d.worlds.find(x=>x.id===wid);world.moodAccess=f.has('moodAccess');const hours=Number(f.get('hours'));world.proactive={enabled:f.has('enabled'),hours,quiet:f.has('quiet'),start:String(f.get('start')||'00:00'),end:String(f.get('end')||'06:00'),next:Date.now()+hours*3600000};},'主動訊息設定已儲存');};
+ for(const b of document.querySelectorAll('[data-message-menu]')){b.onclick=()=>messageMenu(b.dataset.messageMenu);const bubble=b.parentElement.querySelector('.im-bubble');let timer;const stop=()=>clearTimeout(timer);bubble.onpointerdown=()=>{timer=setTimeout(()=>messageMenu(b.dataset.messageMenu),550);};bubble.onpointerup=stop;bubble.onpointercancel=stop;bubble.onpointermove=stop;bubble.oncontextmenu=e=>{e.preventDefault();stop();messageMenu(b.dataset.messageMenu);};}
+}
+function messageMenu(id){if(busy)return;const m=w().messages.find(x=>x.id===id);if(!m)return;const rows=w().messages.filter(x=>x.threadId===m.threadId),i=rows.findIndex(x=>x.id===id);let start=i,end=i;if(m.role==='assistant'){while(start>0&&rows[start-1].role==='assistant')start--;while(end+1<rows.length&&rows[end+1].role==='assistant')end++;}const can=m.role==='assistant'&&end===rows.length-1&&start>0;modal('訊息操作',`<p>${esc(m.content.slice(0,150))}</p><label class="field">操作<select name="op"><option value="edit">編輯</option><option value="delete">刪除</option><option value="copy">複製</option><option value="quote">引用</option>${can?'<option value="regen">重新生成最後一組回覆</option>':''}</select></label>${inputField('編輯文字','content',m.content,4)}`,{label:'執行',submit:async f=>{const op=f.get('op');if(op==='edit'){const text=String(f.get('content')).trim();if(!text||text.length>32000)throw Error('文字長度不符');await change(d=>{d.messages.find(x=>x.id===id).content=text;},'訊息已編輯');}if(op==='delete'&&confirm('刪除這則訊息？已完成的虛擬交易不退款。'))await change(d=>{d.messages=d.messages.filter(x=>x.id!==id);},'已刪除');if(op==='copy')await navigator.clipboard.writeText(m.content);if(op==='quote'){replyDrafts.set(draftKey(),id);render();}if(op==='regen'&&can)setTimeout(()=>submitMessage('',{regenerateIds:rows.slice(start,end+1).map(x=>x.id)}),0);}});}
+async function runProactive28(){if(!service||busy||document.hidden||$('#modal').open||view!=='chat'||$('#message-input')?.value.trim())return;const {world,thread}=scope(),p=world.proactive;if(!p?.enabled||!thread||!Number.isFinite(p.next)||Date.now()<p.next)return;const now=new Date(),hm=now.toTimeString().slice(0,5),a=p.start||'00:00',b=p.end||'06:00';if(p.quiet&&a!==b&&(a<b?hm>=a&&hm<b:hm>=a||hm<b))return;const recent=w().messages.filter(m=>m.threadId===thread.id).at(-1);if(recent&&Date.now()-Date.parse(recent.createdAt)<p.hours*3600000)return;const next=Date.now()+p.hours*3600000*(0.85+Math.random()*0.3);if(await change(d=>{d.worlds.find(x=>x.id===world.id).proactive.next=next;}))await submitMessage('',{proactive:true});}
+
+async function init(){try{repo=await ChatStorage.open();let data=await repo.load();if(!data){data=C.seed();await repo.save(data);}else{data=C.validate(data);}service=new C.WorkspaceService(repo,data);render();setTimeout(runDailyLife,0);setInterval(runProactive28,60000);setTimeout(runProactive28,1500);}catch(e){$('#app').innerHTML=`<main class="fatal"><span class="brand-icon">${icon('moon')}</span><h1>本機資料暫時無法開啟</h1><p>${esc(e.message)}</p><p>請確認 Safari 允許網站儲存，再重新整理。</p><button class="button primary" onclick="location.reload()">重新整理</button></main>`;}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer){drawer=false;render();}});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)runDailyLife();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){runDailyLife();runProactive28();}});
 function updateViewport(){const v=window.visualViewport;const root=document.documentElement;root.style.setProperty('--visible-height',Math.round(v?.height||window.innerHeight)+'px');root.style.setProperty('--visible-top',Math.max(0,Math.round(v?.offsetTop||0))+'px');}
 window.visualViewport?.addEventListener('scroll',updateViewport);
 window.visualViewport?.addEventListener('resize',updateViewport);window.addEventListener('resize',updateViewport);updateViewport();
