@@ -262,6 +262,9 @@ input[type=date]::-webkit-date-and-time-value{min-width:0;text-align:left}
 .gift-dialog[open]{position:fixed;inset:auto;top:calc(var(--visible-top,0px) + var(--visible-height,100dvh)/2);left:50%;transform:translate(-50%,-50%);margin:0;max-height:calc(var(--visible-height,100dvh) - 24px);overflow:hidden}.gift-dialog form{display:flex;flex-direction:column;max-height:calc(var(--visible-height,100dvh) - 26px);min-height:0}.gift-dialog .dialog-body{min-height:0;overflow:auto;overscroll-behavior:contain;flex:1 1 auto}.gift-dialog .dialog-heading,.gift-dialog .dialog-footer{flex:none}.gift-dialog textarea{scroll-margin:12px;resize:vertical;min-height:60px}
 .metric-chart-details{margin:14px 0;color:var(--green);font-size:14px}.metric-chart-details summary{cursor:pointer}.interactive-trend{display:block;width:100%;height:auto;touch-action:pan-y;color:var(--muted)}.chart-reading{font-weight:600;min-height:24px;margin:8px 0;overflow-wrap:anywhere}.chart-dates{font-size:12px;color:var(--muted);text-align:center}.chart-pan,.chart-cursor{display:block;margin-top:10px;font-size:12px;color:var(--muted)}.chart-pan[hidden]{display:none}.chart-pan input,.chart-cursor input{display:block;width:100%;accent-color:var(--green);min-width:0;padding:0;border:0;background:transparent}.chart-ranges .button{font-size:12px;min-height:32px}.metric-chart-details .hint{font-size:12px}
 
+/* v0.2.11: editable thread title, without world prefix */
+.im-heading-title{min-width:0}.im-header .im-title-edit{display:inline-flex;align-items:center;justify-content:center;gap:5px;max-width:100%;padding:2px 5px;border:0;background:transparent;color:var(--muted);font-size:.78rem;line-height:1.4;border-radius:5px;vertical-align:top}.im-title-edit span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.im-title-edit svg{width:12px;height:12px;flex:none;opacity:.75}.im-title-edit:hover{background:#edf0e6}.im-header .heading-menu{z-index:40}
+
 @media(max-width:760px){.topbar,.chat-mode .topbar{height:calc(50px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}.chat-mode .composer-wrap{padding-bottom:max(12px,env(safe-area-inset-bottom))}}</style></head>
 <body><div id="app"><div class="boot">正在開啟小倉庫…</div></div><dialog id="modal" aria-label="操作視窗"></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>(function(root){
@@ -372,7 +375,7 @@ class WorkspaceService{
    }
    if(validImage(image))message.image=image;
    if(!proactive&&!regenerateIds.length)w.messages.push(message);
-   if(first&&!proactive)thread.title=kind==='sticker'?'貼圖聊天':kind==='photo'?'照片聊天':content.trim().slice(0,24);
+   if(first&&!proactive&&!thread.titleLocked&&(!thread.title.trim()||thread.title==='新的對話'))thread.title=kind==='sticker'?'貼圖聊天':kind==='photo'?'照片聊天':content.trim().slice(0,24);
    model=normalizeModelSettings(modelOverride??w.settings.model);provider=providers.get(model.provider);
    if(!provider)throw new ProviderError('目前沒有安裝「'+model.provider+'」Provider。',{code:'provider_missing'});
    if(provider.id==='mock'&&provider.models.length&&!provider.models.some(x=>x.id===model.model))throw new ProviderError('目前 Provider 不支援「'+model.model+'」模型。',{code:'model_missing'});
@@ -409,7 +412,8 @@ class WorkspaceService{
   });}finally{if(this.activeController===controller)this.activeController=null;}
  }
 }
-const api={PROACTIVE_RULE,id,now,copy,DEFAULT_MODEL_SETTINGS,normalizeModelSettings,seed,validate,scope,context,backup,readBackup,characterPackage,addPackage,deleteThread,ProviderError,MockProvider,providers,registerProvider,providerCatalog,generateWithRetry,WorkspaceService,validImage,gifts,stickers};
+function renameThread(w,id,value){const t=w.threads.find(t=>t.id===id),title=String(value??'').trim();if(!t||!title||title.length>120)throw Error('對話名稱無效。');t.title=title;t.titleLocked=true;return t;}
+const api={renameThread,PROACTIVE_RULE,id,now,copy,DEFAULT_MODEL_SETTINGS,normalizeModelSettings,seed,validate,scope,context,backup,readBackup,characterPackage,addPackage,deleteThread,ProviderError,MockProvider,providers,registerProvider,providerCatalog,generateWithRetry,WorkspaceService,validImage,gifts,stickers};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ChatCore=api;
 })(globalThis);
 
@@ -698,7 +702,7 @@ function render(preserveChat=false){
  <div class="thread-heading"><span>這個世界的對話</span><button class="icon-btn" data-action="new-thread" aria-label="新增對話" title="新增對話">${icon('plus')}</button></div>
  <label class="search-box">${icon('search')}<input id="thread-search" placeholder="找一段對話" value="${esc(search)}" aria-label="搜尋目前世界的對話"></label>
  <div class="thread-list">${threads.map(t=>`<button class="thread ${t.id===thread?.id?'selected':''}" data-thread="${t.id}"><span>${icon('chat')}</span><div>${esc(t.title)}<small>${roomLabel(t)} · ${date(t.updatedAt,{month:'short',day:'numeric'})}${unread.has(t.id)?' · 未讀':''}</small></div></button>`).join('')||'<div class="list-empty">還沒有對話，<br>從一句話開始就好。</div>'}</div></div>
- <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.10</span></div></div></aside>
+ <div class="sidebar-bottom">${navButton('settings','設定與備份','settings')}<div class="local-status"><i></i>留在這台裝置 <span>v0.2.11</span></div></div></aside>
  <main class="main ${view==='chat'?'chat-mode messenger':''}"><header class="topbar"><button class="icon-btn mobile-only" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button><div class="breadcrumb"><span>${esc(character.name)}</span><span class="slash">/</span><select id="world-select" aria-label="切換世界">${w().worlds.filter(x=>x.characterId===character.id).map(x=>`<option value="${x.id}" ${x.id===world.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div><span class="provider-pill"><i></i>${esc(provider?.label||model.provider)}<span class="wide-text"> · ${esc(model.model)}</span></span><button class="icon-btn context-button" data-action="context" aria-label="查看本次上下文" title="查看本次上下文">${icon('file')}</button></header>
  ${view==='chat'?chatPage(character,world,thread):view==='profile'?profilePage(character,world):['feed','records'].includes(view)?lifePage(view,character,world):settingsPage()}
  </main>`;
@@ -725,9 +729,9 @@ function chatPage(c,world,t){
  const composerQuote=byId.get(replyDrafts.get(draftKey()));
  return `<section class="chat-view im-page">
  <header class="im-header"><button type="button" class="icon-btn" data-action="open-drawer" aria-label="打開選單">${icon('menu')}</button>
- <div><h1>${esc(c.name)}</h1><small>${esc(world.name)}${t?' · '+esc(t.title):''}</small></div>
+ <div class="im-heading-title"><h1>${esc(c.name)}</h1>${t?`<button type="button" class="im-title-edit" data-action="rename-thread" aria-label="修改對話標題" title="修改對話標題"><span>${esc(t.title||'新的對話')}</span>${icon('edit')}</button>`:`<small>新的對話</small>`}</div>
  <details class="heading-menu"><summary class="icon-btn heading-menu-trigger" aria-label="更多房間操作">⋯</summary><div class="heading-menu-panel">
- ${t?'<button type="button" data-action="mark-unread">標為未讀</button><button type="button" data-action="rename-thread">重新命名</button><button type="button" data-action="export-thread">匯出對話</button><button type="button" class="danger" data-action="delete-thread">刪除對話</button>':''}
+ ${t?'<button type="button" data-action="mark-unread">標為未讀</button><button type="button" data-action="rename-thread">修改對話標題</button><button type="button" data-action="export-thread">匯出對話</button><button type="button" class="danger" data-action="delete-thread">刪除對話</button>':''}
  <button type="button" data-action="context">查看模型資料</button></div></details></header>
  <div class="messages" id="messages" role="log" aria-label="聊天紀錄"><div class="message-column">${all.length>messages.length?'<button class="button secondary load-history" data-action="older-messages">載入更早的訊息</button>':''}
  ${messages.length?messages.map((m,i)=>(i===0||LittleLife.localDate(new Date(m.createdAt))!==LittleLife.localDate(new Date(messages[i-1].createdAt))?`<div class="date-divider">${esc(dayLabel(m.createdAt))}</div>`:'')+messageBubble(m,c,byId)).join(''):'<p class="im-empty">還沒有訊息。可以先打個招呼，或點星星讓角色來找妳。</p>'}</div></div>
@@ -1306,12 +1310,12 @@ async function action(name){if(busy)return;
  }
  if(name==='new-thread')modal('新增對話',inputField('對話名稱','title','新的對話'),{label:'建立',submit:async f=>{
   if(!await change(d=>{
-   const t={id:C.id(),worldId:world.id,title:String(f.get('title')).trim()||'新的對話',roomType:'phone',maxOutputTokens:null,createdAt:C.now(),updatedAt:C.now()};
+   const t={id:C.id(),worldId:world.id,title:String(f.get('title')).trim()||'新的對話',titleLocked:String(f.get('title')).trim()!=='新的對話',roomType:'phone',maxOutputTokens:null,createdAt:C.now(),updatedAt:C.now()};
    d.threads.push(t);d.selected.threadId=t.id;
   }))throw Error('建立失敗');
   view='chat';drawer=false;render();
  }});
- if(name==='rename-thread')modal('重新命名對話',inputField('對話名稱','title',thread.title),{submit:async f=>{if(!await change(d=>{d.threads.find(t=>t.id===thread.id).title=String(f.get('title')).trim();},'名稱已更新'))throw Error('沒有儲存成功，請稍後再試。');}});
+ if(name==='rename-thread'&&thread){const menu=$('.heading-menu');if(menu)menu.open=false;modal('修改對話標題',inputField('對話名稱','title',thread.title),{submit:async f=>{const title=String(f.get('title')).trim();if(!title)throw Error('請輸入對話名稱。');if(!await change(d=>{C.renameThread(d,thread.id,title);},'名稱已更新',true))throw Error('沒有儲存成功，請稍後再試。');}});return;}
  if(name==='delete-thread'&&await confirmDialog('刪除這段對話？','「'+esc(thread.title)+'」和其中的訊息將從本機移除。若想保留，請先匯出完整備份。','刪除對話'))await change(d=>{C.deleteThread(d,thread.id);},'對話已刪除');
  if(name==='new-character')modal('新的相遇',inputField('角色名字','name')+inputField('起始世界','world','日常')+'<p class="hint">建立後可以補上人設、頭像與參考資料。新角色不會帶入其他人的聊天記憶。</p>',{label:'建立角色',submit:async f=>{if(!await change(d=>{const cid=C.id(),wid=C.id();d.characters.push({id:cid,name:String(f.get('name')).trim(),description:'',persona:'',avatar:''});d.worlds.push({id:wid,characterId:cid,name:String(f.get('world')).trim(),instructions:'',memory:''});d.selected={characterId:cid,worldId:wid,threadId:null};},'角色已建立'))throw Error('建立失敗');view='profile';search='';drawer=false;render();}});
  if(name==='duplicate-character'){const p=C.characterPackage(w(),character.id,false);p.character.name=(p.character.name+' · 副本').slice(0,60);await change(d=>Object.assign(d,C.addPackage(d,p)),'已複製設定；沒有帶入聊天或世界記憶');}
